@@ -379,221 +379,70 @@ const DISTRICTS = [
 
 const CATEGORIES = ["Lácteos","Bebidas","Cervezas","Licores","Frutas y Verduras","Carnes y Pescados","Panadería","Abarrotes","Cuidado del hogar","Saludable","Market Asiático","Farmacia","Premium y Gourmet"];
 
-const PRODUCTS = [
-  {id:"leche-gloria-entera-1l",name:"Leche Gloria Entera",brand:"Gloria",category:"Lácteos",presentation:"1 L",qty:1,unit:"L",synonyms:["leche entera","leche gloria azul"],
-    basePrices:{plazavea:5.90,wong:6.20,metro:6.10,tottus:6.00,vivanda:6.40}},
-  {id:"leche-gloria-light-1l",name:"Leche Gloria Light",brand:"Gloria",category:"Lácteos",presentation:"1 L",qty:1,unit:"L",synonyms:["leche descremada"],
-    basePrices:{plazavea:6.10,wong:6.40,metro:6.30,tottus:6.20,vivanda:6.60}},
-  {id:"leche-gloria-deslactosada-1l",name:"Leche Gloria Sin Lactosa",brand:"Gloria",category:"Lácteos",presentation:"1 L",qty:1,unit:"L",synonyms:["leche deslactosada","sin lactosa"],
-    basePrices:{plazavea:6.80,wong:7.10,metro:7.00,tottus:6.90,vivanda:7.30}},
-  {id:"leche-gloria-evaporada-400g",name:"Leche Gloria Evaporada",brand:"Gloria",category:"Lácteos",presentation:"Tarro 400 g",qty:0.4,unit:"kg",synonyms:["leche en tarro","evaporada"],
-    basePrices:{plazavea:2.30,wong:2.50,metro:2.40,tottus:2.35,vivanda:2.60}},
-  {id:"pack-leche-gloria-1l-x6",name:"Pack Leche Gloria Entera",brand:"Gloria",category:"Lácteos",presentation:"Pack 6 x 1 L",qty:6,unit:"L",synonyms:["pack de leche","six pack leche"],
-    basePrices:{plazavea:33.90,wong:35.50,metro:34.90,tottus:34.50,vivanda:36.20}},
-  {id:"leche-laive-entera-1l",name:"Leche Laive Entera",brand:"Laive",category:"Lácteos",presentation:"1 L",qty:1,unit:"L",synonyms:[],
-    basePrices:{plazavea:5.80,wong:6.10,metro:6.00,tottus:5.90,vivanda:6.30}},
-  {id:"yogurt-gloria-fresa-1l",name:"Yogurt Gloria Fresa",brand:"Gloria",category:"Lácteos",presentation:"1 L",qty:1,unit:"unidad",synonyms:["yogurt de fresa"],
-    basePrices:{plazavea:7.20,wong:7.60,metro:7.40,tottus:7.30,vivanda:7.80}},
-  {id:"yogurt-griego-gloria-150g",name:"Yogurt Griego Gloria",brand:"Gloria",category:"Lácteos",presentation:"150 g",qty:1,unit:"unidad",synonyms:["yogurt griego"],
-    basePrices:{plazavea:3.80,wong:4.10,metro:3.90,tottus:3.85,vivanda:4.20}},
-  {id:"pack-yogurt-griego-gloria-4x150g",name:"Pack Yogurt Griego Gloria",brand:"Gloria",category:"Lácteos",presentation:"Pack 4 x 150 g",qty:4,unit:"unidad",synonyms:["pack yogurt griego"],
-    basePrices:{plazavea:14.90,wong:15.90,metro:15.40,tottus:15.20,vivanda:16.50}},
-  {id:"coca-cola-zero-1.5l",name:"Coca-Cola Zero",brand:"Coca-Cola",category:"Bebidas",presentation:"1.5 L",qty:1.5,unit:"L",synonyms:["coca zero","cocacola zero","gaseosa zero","coca cola sin azucar"],
-    basePrices:{plazavea:6.50,wong:6.90,metro:6.70,tottus:6.60,vivanda:7.10}},
-  {id:"coca-cola-zero-500ml",name:"Coca-Cola Zero",brand:"Coca-Cola",category:"Bebidas",presentation:"500 ml",qty:500,unit:"ml",synonyms:["coca zero personal"],
-    basePrices:{plazavea:2.90,wong:3.10,metro:3.00,tottus:2.95,vivanda:3.20}},
-  {id:"coca-cola-original-1.5l",name:"Coca-Cola Original",brand:"Coca-Cola",category:"Bebidas",presentation:"1.5 L",qty:1.5,unit:"L",synonyms:["coca cola normal","gaseosa coca cola"],
-    basePrices:{plazavea:6.90,wong:7.30,metro:7.10,tottus:7.00,vivanda:7.50}},
-  {id:"inca-kola-1.5l",name:"Inca Kola",brand:"Inca Kola",category:"Bebidas",presentation:"1.5 L",qty:1.5,unit:"L",synonyms:["gaseosa amarilla","kola"],
-    basePrices:{plazavea:6.80,wong:7.20,metro:7.00,tottus:6.90,vivanda:7.40}},
-  {id:"agua-san-luis-sin-gas-625ml",name:"Agua San Luis Sin Gas",brand:"San Luis",category:"Bebidas",presentation:"625 ml",qty:625,unit:"ml",synonyms:["agua mineral","agua sin gas"],
-    basePrices:{plazavea:1.50,wong:1.70,metro:1.60,tottus:1.55,vivanda:1.80}},
-  {id:"papel-elite-doble-hoja-x4",name:"Papel Higiénico Elite Doble Hoja",brand:"Elite",category:"Cuidado del hogar",presentation:"Pack x4",qty:4,unit:"unidad",synonyms:["papel elite","papel higienico elite","papel del bano elite"],
-    basePrices:{plazavea:9.90,wong:10.50,metro:10.20,tottus:10.00,vivanda:10.90}},
-  {id:"papel-elite-suave-x8",name:"Papel Higiénico Elite Suave",brand:"Elite",category:"Cuidado del hogar",presentation:"Pack x8",qty:8,unit:"unidad",synonyms:["papel elite pack grande"],
-    basePrices:{plazavea:17.90,wong:18.90,metro:18.30,tottus:18.00,vivanda:19.50}},
-  {id:"papel-noble-x4",name:"Papel Higiénico Noble",brand:"Noble",category:"Cuidado del hogar",presentation:"Pack x4",qty:4,unit:"unidad",synonyms:["papel noble","papel higienico noble"],
-    basePrices:{plazavea:8.50,wong:9.10,metro:8.80,tottus:8.60,vivanda:9.40}},
-  {id:"pollo-entero-san-fernando-kg",name:"Pollo Entero San Fernando",brand:"San Fernando",category:"Carnes y Pescados",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["pollo","pollo fresco","pollo entero"],
-    basePrices:{plazavea:13.90,wong:14.50,metro:14.20,tottus:13.80,vivanda:14.90}},
-  {id:"pechuga-pollo-san-fernando-kg",name:"Pechuga de Pollo San Fernando",brand:"San Fernando",category:"Carnes y Pescados",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["pollo","pechuga","pechuga de pollo"],
-    basePrices:{plazavea:17.90,wong:18.60,metro:18.20,tottus:17.70,vivanda:19.10}},
-  {id:"trozos-pollo-redondos-san-fernando-kg",name:"Trozos de Pollo Redondos",brand:"San Fernando",category:"Carnes y Pescados",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["pollo","trozos de pollo","presas de pollo"],
-    basePrices:{plazavea:15.50,wong:16.20,metro:15.90,tottus:15.40,vivanda:16.60}},
-  {id:"arroz-costeno-extra-750g",name:"Arroz Costeño Extra",brand:"Costeño",category:"Abarrotes",presentation:"750 g",qty:0.75,unit:"kg",synonyms:["arroz"],
-    basePrices:{plazavea:3.90,wong:4.20,metro:4.00,tottus:3.95,vivanda:4.30}},
-  {id:"arroz-paisana-750g",name:"Arroz Paisana",brand:"Paisana",category:"Abarrotes",presentation:"750 g",qty:0.75,unit:"kg",synonyms:["arroz"],
-    basePrices:{plazavea:3.60,wong:3.90,metro:3.75,tottus:3.65,vivanda:4.00}},
-  {id:"huevos-rojos-san-fernando-x30",name:"Huevos Rojos San Fernando",brand:"San Fernando",category:"Abarrotes",presentation:"Panal x30",qty:30,unit:"unidad",synonyms:["huevos","huevos rojos","panal de huevos"],
-    basePrices:{plazavea:16.90,wong:17.90,metro:17.40,tottus:17.00,vivanda:18.20}},
-  {id:"huevos-blancos-x30",name:"Huevos Blancos",brand:"Genérico",category:"Abarrotes",presentation:"Panal x30",qty:30,unit:"unidad",synonyms:["huevos","huevos blancos"],
-    basePrices:{plazavea:14.90,wong:15.70,metro:15.30,tottus:15.00,vivanda:16.10}},
-  {id:"aceite-primor-1l",name:"Aceite Primor",brand:"Primor",category:"Abarrotes",presentation:"1 L",qty:1,unit:"L",synonyms:["aceite vegetal","aceite de cocina"],
-    basePrices:{plazavea:9.90,wong:10.40,metro:10.10,tottus:9.95,vivanda:10.60}},
-  {id:"aceite-cocinero-1l",name:"Aceite Cocinero",brand:"Cocinero",category:"Abarrotes",presentation:"1 L",qty:1,unit:"L",synonyms:["aceite vegetal","aceite de cocina"],
-    basePrices:{plazavea:9.50,wong:9.90,metro:9.70,tottus:9.60,vivanda:10.10}},
-  {id:"azucar-rubia-cartavio-1kg",name:"Azúcar Rubia Cartavio",brand:"Cartavio",category:"Abarrotes",presentation:"1 Kg",qty:1,unit:"kg",synonyms:["azucar"],
-    basePrices:{plazavea:4.50,wong:4.80,metro:4.65,tottus:4.55,vivanda:4.90}},
-  {id:"fideos-don-vittorio-spaghetti-500g",name:"Fideos Don Vittorio Spaghetti",brand:"Don Vittorio",category:"Abarrotes",presentation:"500 g",qty:0.5,unit:"kg",synonyms:["fideos","spaghetti","fideos spaghetti"],
-    basePrices:{plazavea:3.20,wong:3.50,metro:3.35,tottus:3.25,vivanda:3.60}},
-  {id:"pan-molde-bimbo-integral-650g",name:"Pan de Molde Bimbo Integral",brand:"Bimbo",category:"Panadería",presentation:"650 g",qty:0.65,unit:"kg",synonyms:["pan de molde","pan integral","pan bimbo"],
-    basePrices:{plazavea:7.90,wong:8.40,metro:8.10,tottus:8.00,vivanda:8.60}},
+/* ---------------- real data (Supabase) ---------------- */
+const SUPABASE_URL = "https://etubpfjpugqykamejzrf.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0dWJwZmpwdWdxeWthbWVqenJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY3MjY0OTgsImV4cCI6MjEwMjMwMjQ5OH0.PKq1P51uW1UBasEcfq0WWSmgmVprxjfwokQnE348R9A";
 
-  {id:"cerveza-pilsen-callao-620ml",name:"Cerveza Pilsen Callao",brand:"Pilsen Callao",category:"Cervezas",presentation:"Botella 620 ml",qty:0.62,unit:"L",synonyms:["cerveza","pilsen"],
-    basePrices:{plazavea:8.50,wong:9.20,metro:8.90,tottus:8.70,vivanda:9.50}},
-  {id:"pack-cerveza-cristal-355ml-x6",name:"Pack Cerveza Cristal",brand:"Cristal",category:"Cervezas",presentation:"Pack 6 x 355 ml",qty:2.13,unit:"L",synonyms:["cerveza","cristal","six pack"],
-    basePrices:{plazavea:24.90,wong:26.90,metro:25.90,tottus:25.50,vivanda:27.50}},
-  {id:"cerveza-cusquena-dorada-620ml",name:"Cerveza Cusqueña Dorada",brand:"Cusqueña",category:"Cervezas",presentation:"Botella 620 ml",qty:0.62,unit:"L",synonyms:["cerveza","cusquena"],
-    basePrices:{plazavea:9.90,wong:10.60,metro:10.30,tottus:10.10,vivanda:10.90}},
-  {id:"pack-cerveza-corona-355ml-x6",name:"Pack Cerveza Corona",brand:"Corona",category:"Cervezas",presentation:"Pack 6 x 355 ml",qty:2.13,unit:"L",synonyms:["cerveza","corona","six pack corona"],
-    basePrices:{plazavea:34.90,wong:37.90,metro:36.50,tottus:35.90,vivanda:38.90}},
-  {id:"pack-cerveza-heineken-355ml-x6",name:"Pack Cerveza Heineken",brand:"Heineken",category:"Cervezas",presentation:"Pack 6 x 355 ml",qty:2.13,unit:"L",synonyms:["cerveza","heineken"],
-    basePrices:{plazavea:32.90,wong:35.50,metro:34.20,tottus:33.90,vivanda:36.50}},
-  {id:"cerveza-cusquena-trigo-620ml",name:"Cerveza Cusqueña Trigo",brand:"Cusqueña",category:"Cervezas",presentation:"Botella 620 ml",qty:0.62,unit:"L",synonyms:["cerveza","cusquena trigo"],
-    basePrices:{plazavea:10.50,wong:11.30,metro:10.90,tottus:10.70,vivanda:11.60}},
+let PRODUCTS = [];
+let PRODUCT_BY_ID = {};
+let PRICES = {};      // `${productId}|${chainId}` -> fila de product_prices
+let HISTORY = {};     // `${productId}|${chainId}` -> [{price, recorded_at}] ascendente
 
-  {id:"pisco-quebranta-ocucaje-700ml",name:"Pisco Quebranta Ocucaje",brand:"Ocucaje",category:"Licores",presentation:"700 ml",qty:0.7,unit:"L",synonyms:["pisco"],
-    basePrices:{plazavea:39.90,wong:43.90,metro:41.90,tottus:40.90,vivanda:45.90}},
-  {id:"ron-cartavio-anejo-750ml",name:"Ron Cartavio Añejo",brand:"Cartavio",category:"Licores",presentation:"750 ml",qty:0.75,unit:"L",synonyms:["ron"],
-    basePrices:{plazavea:44.90,wong:48.90,metro:46.90,tottus:45.90,vivanda:49.90}},
-  {id:"whisky-johnnie-walker-red-750ml",name:"Whisky Johnnie Walker Red Label",brand:"Johnnie Walker",category:"Licores",presentation:"750 ml",qty:0.75,unit:"L",synonyms:["whisky"],
-    basePrices:{plazavea:79.90,wong:86.90,metro:83.90,tottus:81.90,vivanda:89.90}},
-  {id:"vino-tabernero-reserva-750ml",name:"Vino Tinto Tabernero Reserva",brand:"Tabernero",category:"Licores",presentation:"750 ml",qty:0.75,unit:"L",synonyms:["vino","vino tinto"],
-    basePrices:{plazavea:29.90,wong:32.90,metro:31.20,tottus:30.50,vivanda:34.20}},
-  {id:"vino-queirolo-blanco-750ml",name:"Vino Blanco Santiago Queirolo",brand:"Santiago Queirolo",category:"Licores",presentation:"750 ml",qty:0.75,unit:"L",synonyms:["vino blanco","vino"],
-    basePrices:{plazavea:26.90,wong:29.50,metro:28.10,tottus:27.50,vivanda:30.90}},
-
-  {id:"palta-fuerte-kg",name:"Palta Fuerte",brand:"Selección",category:"Frutas y Verduras",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["palta","aguacate"],
-    basePrices:{plazavea:6.90,wong:7.90,metro:7.20,tottus:6.80,vivanda:8.50}},
-  {id:"platano-seda-kg",name:"Plátano de Seda",brand:"Selección",category:"Frutas y Verduras",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["platano","banana"],
-    basePrices:{plazavea:3.20,wong:3.80,metro:3.40,tottus:3.30,vivanda:4.00}},
-  {id:"manzana-israel-kg",name:"Manzana Israel",brand:"Selección",category:"Frutas y Verduras",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["manzana"],
-    basePrices:{plazavea:5.90,wong:6.70,metro:6.20,tottus:5.95,vivanda:7.10}},
-  {id:"limon-kg",name:"Limón",brand:"Selección",category:"Frutas y Verduras",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["limon"],
-    basePrices:{plazavea:4.50,wong:5.20,metro:4.80,tottus:4.60,vivanda:5.50}},
-  {id:"tomate-italiano-kg",name:"Tomate Italiano",brand:"Selección",category:"Frutas y Verduras",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["tomate"],
-    basePrices:{plazavea:3.90,wong:4.50,metro:4.10,tottus:3.95,vivanda:4.80}},
-  {id:"cebolla-roja-kg",name:"Cebolla Roja",brand:"Selección",category:"Frutas y Verduras",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["cebolla"],
-    basePrices:{plazavea:2.90,wong:3.40,metro:3.10,tottus:2.95,vivanda:3.60}},
-  {id:"papa-blanca-kg",name:"Papa Blanca",brand:"Selección",category:"Frutas y Verduras",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["papa"],
-    basePrices:{plazavea:2.50,wong:2.90,metro:2.70,tottus:2.55,vivanda:3.10}},
-  {id:"naranja-jugo-kg",name:"Naranja de Jugo",brand:"Selección",category:"Frutas y Verduras",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["naranja"],
-    basePrices:{plazavea:3.50,wong:4.10,metro:3.80,tottus:3.60,vivanda:4.30}},
-
-  {id:"bistec-res-kg",name:"Bistec de Res",brand:"San Fernando",category:"Carnes y Pescados",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["carne","res","bistec"],
-    basePrices:{plazavea:28.90,wong:31.50,metro:30.20,tottus:29.50,vivanda:32.90}},
-  {id:"carne-molida-res-kg",name:"Carne Molida de Res",brand:"San Fernando",category:"Carnes y Pescados",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["carne molida","res molida"],
-    basePrices:{plazavea:24.90,wong:27.20,metro:26.10,tottus:25.50,vivanda:28.50}},
-  {id:"filete-perico-kg",name:"Filete de Perico",brand:"Pesquero",category:"Carnes y Pescados",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["pescado","filete de pescado","perico"],
-    basePrices:{plazavea:26.90,wong:29.90,metro:28.20,tottus:27.50,vivanda:31.20}},
-  {id:"chuleta-cerdo-kg",name:"Chuleta de Cerdo",brand:"San Fernando",category:"Carnes y Pescados",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["cerdo","chuleta"],
-    basePrices:{plazavea:19.90,wong:21.90,metro:20.90,tottus:20.20,vivanda:22.80}},
-  {id:"tocino-ahumado-200g",name:"Tocino Ahumado",brand:"San Fernando",category:"Carnes y Pescados",presentation:"200 g",qty:0.2,unit:"kg",synonyms:["tocino","bacon"],
-    basePrices:{plazavea:9.90,wong:10.90,metro:10.40,tottus:10.10,vivanda:11.50}},
-
-  {id:"avena-quaker-tradicional-400g",name:"Avena Quaker Tradicional",brand:"Quaker",category:"Saludable",presentation:"400 g",qty:0.4,unit:"kg",synonyms:["avena"],
-    basePrices:{plazavea:6.50,wong:7.10,metro:6.80,tottus:6.60,vivanda:7.40}},
-  {id:"quinua-organica-500g",name:"Quinua Orgánica",brand:"Sol de Andes",category:"Saludable",presentation:"500 g",qty:0.5,unit:"kg",synonyms:["quinua","quinoa"],
-    basePrices:{plazavea:9.90,wong:10.90,metro:10.30,tottus:10.00,vivanda:11.50}},
-  {id:"leche-almendras-silk-1l",name:"Leche de Almendras Silk",brand:"Silk",category:"Saludable",presentation:"1 L",qty:1,unit:"L",synonyms:["leche vegetal","leche de almendras"],
-    basePrices:{plazavea:14.90,wong:16.20,metro:15.50,tottus:15.10,vivanda:16.90}},
-  {id:"barritas-cereal-quaker-x6",name:"Barritas de Cereal Quaker",brand:"Quaker",category:"Saludable",presentation:"Pack 6 unid",qty:6,unit:"unidad",synonyms:["barritas","barra de cereal"],
-    basePrices:{plazavea:11.90,wong:12.90,metro:12.30,tottus:12.00,vivanda:13.40}},
-  {id:"mix-frutos-secos-200g",name:"Mix de Frutos Secos",brand:"Nature's Heart",category:"Saludable",presentation:"200 g",qty:0.2,unit:"kg",synonyms:["frutos secos","mix"],
-    basePrices:{plazavea:13.90,wong:15.20,metro:14.50,tottus:14.10,vivanda:15.90}},
-  {id:"yogurt-griego-gloria-light-150g",name:"Yogurt Griego Gloria Light",brand:"Gloria",category:"Saludable",presentation:"150 g",qty:1,unit:"unidad",synonyms:["yogurt griego light","yogurt sin azucar"],
-    basePrices:{plazavea:4.10,wong:4.40,metro:4.20,tottus:4.15,vivanda:4.50}},
-
-  {id:"pan-frances-x10",name:"Pan Francés",brand:"Panadería",category:"Panadería",presentation:"Pack x10",qty:10,unit:"unidad",synonyms:["pan frances","pan"],
-    basePrices:{plazavea:4.90,wong:5.50,metro:5.10,tottus:4.95,vivanda:5.80}},
-  {id:"croissant-mantequilla-x4",name:"Croissant Mantequilla",brand:"Panadería",category:"Panadería",presentation:"Pack x4",qty:4,unit:"unidad",synonyms:["croissant"],
-    basePrices:{plazavea:9.90,wong:11.20,metro:10.50,tottus:10.10,vivanda:11.90}},
-  {id:"pan-pita-x6",name:"Pan Pita",brand:"Panadería",category:"Panadería",presentation:"Pack x6",qty:6,unit:"unidad",synonyms:["pan pita","pita"],
-    basePrices:{plazavea:6.90,wong:7.60,metro:7.20,tottus:7.00,vivanda:7.90}},
-  {id:"keke-ingles-bimbo-400g",name:"Keke Inglés Bimbo",brand:"Bimbo",category:"Panadería",presentation:"400 g",qty:0.4,unit:"kg",synonyms:["keke","queque"],
-    basePrices:{plazavea:8.90,wong:9.80,metro:9.30,tottus:9.00,vivanda:10.20}},
-
-  {id:"salsa-soya-kikkoman-150ml",name:"Salsa de Soya Kikkoman",brand:"Kikkoman",category:"Market Asiático",presentation:"150 ml",qty:0.15,unit:"L",synonyms:["sillao","soya","salsa de soya"],
-    basePrices:{plazavea:9.90,wong:10.90,metro:10.30,tottus:10.00,vivanda:11.50}},
-  {id:"sillao-naruto-500ml",name:"Sillao Naruto",brand:"Naruto",category:"Market Asiático",presentation:"500 ml",qty:0.5,unit:"L",synonyms:["sillao","salsa de soya"],
-    basePrices:{plazavea:7.50,wong:8.30,metro:7.90,tottus:7.70,vivanda:8.70}},
-  {id:"fideos-chinos-saltado-250g",name:"Fideos Chinos para Saltado",brand:"Yakisoba",category:"Market Asiático",presentation:"250 g",qty:0.25,unit:"kg",synonyms:["fideos chinos","tallarin saltado","fideos saltado"],
-    basePrices:{plazavea:5.90,wong:6.50,metro:6.10,tottus:5.95,vivanda:6.80}},
-  {id:"arroz-jazmin-1kg",name:"Arroz Jazmín",brand:"Genérico",category:"Market Asiático",presentation:"1 Kg",qty:1,unit:"kg",synonyms:["arroz jazmin","arroz asiatico"],
-    basePrices:{plazavea:8.90,wong:9.80,metro:9.30,tottus:9.00,vivanda:10.20}},
-  {id:"salsa-ostion-255g",name:"Salsa de Ostión",brand:"Lee Kum Kee",category:"Market Asiático",presentation:"255 g",qty:0.255,unit:"kg",synonyms:["salsa ostion","oyster sauce"],
-    basePrices:{plazavea:14.90,wong:16.50,metro:15.60,tottus:15.20,vivanda:17.20}},
-  {id:"sriracha-200ml",name:"Salsa Sriracha",brand:"Huy Fong",category:"Market Asiático",presentation:"200 ml",qty:0.2,unit:"L",synonyms:["sriracha","salsa picante"],
-    basePrices:{plazavea:12.90,wong:14.20,metro:13.50,tottus:13.10,vivanda:14.90}},
-
-  {id:"paracetamol-500mg-x10",name:"Paracetamol 500 mg",brand:"Genérico",category:"Farmacia",presentation:"Caja x10",qty:10,unit:"unidad",synonyms:["paracetamol","analgesico","dolor de cabeza"],
-    basePrices:{plazavea:4.50,wong:5.20,metro:4.80,tottus:4.60,vivanda:5.50}},
-  {id:"alcohol-gel-purell-250ml",name:"Alcohol en Gel Purell",brand:"Purell",category:"Farmacia",presentation:"250 ml",qty:0.25,unit:"L",synonyms:["alcohol gel","gel antibacterial"],
-    basePrices:{plazavea:8.90,wong:9.90,metro:9.30,tottus:9.00,vivanda:10.20}},
-  {id:"curitas-nexcare-x20",name:"Curitas Nexcare",brand:"Nexcare",category:"Farmacia",presentation:"Caja x20",qty:20,unit:"unidad",synonyms:["curitas","apositos"],
-    basePrices:{plazavea:6.90,wong:7.60,metro:7.20,tottus:7.00,vivanda:7.90}},
-  {id:"protector-solar-nivea-fps50-200ml",name:"Protector Solar Nivea Sun FPS50",brand:"Nivea",category:"Farmacia",presentation:"200 ml",qty:0.2,unit:"L",synonyms:["protector solar","bloqueador"],
-    basePrices:{plazavea:39.90,wong:43.90,metro:41.90,tottus:40.90,vivanda:45.50}},
-  {id:"panales-huggies-talla-m-x30",name:"Pañales Huggies Talla M",brand:"Huggies",category:"Farmacia",presentation:"Paquete x30",qty:30,unit:"unidad",synonyms:["panales","pañales"],
-    basePrices:{plazavea:34.90,wong:38.50,metro:36.90,tottus:35.90,vivanda:39.90}},
-  {id:"toallas-kotex-x10",name:"Toallas Higiénicas Kotex",brand:"Kotex",category:"Farmacia",presentation:"Paquete x10",qty:10,unit:"unidad",synonyms:["toallas higienicas","kotex"],
-    basePrices:{plazavea:9.90,wong:10.80,metro:10.30,tottus:10.00,vivanda:11.20}},
-  {id:"alcohol-medicinal-70-250ml",name:"Alcohol Medicinal 70°",brand:"Genérico",category:"Farmacia",presentation:"250 ml",qty:0.25,unit:"L",synonyms:["alcohol","alcohol medicinal"],
-    basePrices:{plazavea:3.90,wong:4.40,metro:4.10,tottus:3.95,vivanda:4.70}},
-
-  {id:"aceite-oliva-borges-500ml",name:"Aceite de Oliva Extra Virgen Borges",brand:"Borges",category:"Premium y Gourmet",presentation:"500 ml",qty:0.5,unit:"L",synonyms:["aceite de oliva","oliva extra virgen"],
-    basePrices:{plazavea:24.90,wong:27.90,metro:26.20,tottus:25.50,vivanda:29.90}},
-  {id:"queso-parmesano-reggianito-200g",name:"Queso Parmesano Reggianito",brand:"Importado",category:"Premium y Gourmet",presentation:"200 g",qty:0.2,unit:"kg",synonyms:["queso parmesano","parmesano"],
-    basePrices:{plazavea:19.90,wong:22.90,metro:21.20,tottus:20.50,vivanda:24.90}},
-  {id:"jamon-serrano-importado-100g",name:"Jamón Serrano Importado",brand:"Importado",category:"Premium y Gourmet",presentation:"100 g",qty:0.1,unit:"kg",synonyms:["jamon serrano","jamon"],
-    basePrices:{plazavea:22.90,wong:26.90,metro:24.90,tottus:23.90,vivanda:28.90}},
-  {id:"chocolate-lindt-100g",name:"Chocolate Lindt Excellence 70%",brand:"Lindt",category:"Premium y Gourmet",presentation:"100 g",qty:0.1,unit:"kg",synonyms:["chocolate","chocolate suizo"],
-    basePrices:{plazavea:14.90,wong:16.90,metro:15.90,tottus:15.20,vivanda:17.90}},
-  {id:"cafe-altomayo-grano-250g",name:"Café Gourmet en Grano Altomayo",brand:"Altomayo",category:"Premium y Gourmet",presentation:"250 g",qty:0.25,unit:"kg",synonyms:["cafe","cafe en grano","cafe gourmet"],
-    basePrices:{plazavea:17.90,wong:19.90,metro:18.90,tottus:18.20,vivanda:20.90}},
-  {id:"salmon-ahumado-noruego-150g",name:"Salmón Ahumado Noruego",brand:"Importado",category:"Premium y Gourmet",presentation:"150 g",qty:0.15,unit:"kg",synonyms:["salmon","salmon ahumado"],
-    basePrices:{plazavea:32.90,wong:37.90,metro:35.20,tottus:33.90,vivanda:39.90}}
-];
-const CHAIN_IDS = SUPERMARKETS.map(s=>s.id);
-PRODUCTS.forEach(p=>{
-  const vals = CHAIN_IDS.map(c=>p.basePrices[c]);
-  const rnd = mulberry32(hashStr("chainshuffle|"+p.id));
-  const order = CHAIN_IDS.slice();
-  for(let i=order.length-1;i>0;i--){ const j=Math.floor(rnd()*(i+1)); const t=order[i]; order[i]=order[j]; order[j]=t; }
-  const shuffled = {};
-  order.forEach((chain,i)=>{ shuffled[chain]=vals[i]; });
-  p.basePrices = shuffled;
-});
-const PRODUCT_BY_ID = Object.fromEntries(PRODUCTS.map(p=>[p.id,p]));
-
-const UNAVAILABLE = [
-  ["huevos-blancos-x30","vivanda"],["pollo-entero-san-fernando-kg","tottus"],
-  ["papel-noble-x4","wong"],["agua-san-luis-sin-gas-625ml","metro"],
-  ["pack-yogurt-griego-gloria-4x150g","plazavea"],
-  ["whisky-johnnie-walker-red-750ml","tottus"],["salmon-ahumado-noruego-150g","tottus"],
-  ["queso-parmesano-reggianito-200g","metro"],["sillao-naruto-500ml","vivanda"],
-  ["pan-pita-x6","metro"],["mix-frutos-secos-200g","plazavea"]
-];
-function isAvailable(pid,chain){ return !UNAVAILABLE.some(u=>u[0]===pid&&u[1]===chain); }
-
-const STALE_OVERRIDES = [
-  ["leche-gloria-deslactosada-1l","vivanda",2100],
-  ["fideos-don-vittorio-spaghetti-500g","tottus",1800],
-  ["pan-molde-bimbo-integral-650g","metro",3000]
-];
-function updatedMinutesAgo(pid,chain){
-  const o = STALE_OVERRIDES.find(s=>s[0]===pid&&s[1]===chain);
-  if(o) return o[2];
-  return 15 + (hashStr(pid+"|"+chain+"|upd") % 280);
+async function fetchTable(name, query){
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${name}?${query}`, {
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      Range: "0-4999"
+    }
+  });
+  if(!res.ok) throw new Error(`${name}: ${res.status}`);
+  return res.json();
 }
-function updatedAt(pid,chain){ return new Date(Date.now() - updatedMinutesAgo(pid,chain)*60000); }
 
-/* pricing */
+async function loadRealData(){
+  const [products, prices, history] = await Promise.all([
+    fetchTable("products", "select=id,name,presentation,qty,unit,search_terms,brands(name),categories(name)&order=name"),
+    fetchTable("product_prices", "select=product_id,supermarket_id,price,list_price,available,verified_at,last_attempt_at,last_error"),
+    fetchTable("price_history", "select=product_id,supermarket_id,price,recorded_at&order=recorded_at.asc")
+  ]);
+
+  PRODUCTS = products.map(row=>({
+    id: row.id,
+    name: row.name,
+    brand: row.brands ? row.brands.name : "",
+    category: row.categories ? row.categories.name : "",
+    presentation: row.presentation || "",
+    qty: Number(row.qty) || 1,
+    unit: row.unit || "unidad",
+    synonyms: row.search_terms || []
+  }));
+  PRODUCT_BY_ID = Object.fromEntries(PRODUCTS.map(p=>[p.id,p]));
+
+  PRICES = {};
+  prices.forEach(row=>{ PRICES[row.product_id+"|"+row.supermarket_id] = row; });
+
+  HISTORY = {};
+  history.forEach(row=>{
+    const key = row.product_id+"|"+row.supermarket_id;
+    (HISTORY[key] || (HISTORY[key]=[])).push(row);
+  });
+}
+
+/* pricing — leídos de Supabase (ver loadRealData). El precio es a nivel de
+   cadena, igual que el precio web real de estas tiendas (no varía por local). */
+function isAvailable(pid,chain){
+  const row = PRICES[pid+"|"+chain];
+  return !!(row && row.price!=null);
+}
+function updatedAt(pid,chain){
+  const row = PRICES[pid+"|"+chain];
+  const iso = row && (row.verified_at || row.last_attempt_at);
+  return iso ? new Date(iso) : new Date(0);
+}
 function priceAtStoreKey(product, chain, storeKey){
-  const base = product.basePrices[chain];
-  if(base==null) return null;
-  const mult = 0.965 + rand01("sv|"+storeKey+"|"+product.id)*0.07;
-  return Math.round(base*mult*10)/10;
+  const row = PRICES[product.id+"|"+chain];
+  return row && row.price!=null ? row.price : null;
 }
 function nearestStore(chain, loc){
   if(!loc) return null;
@@ -642,13 +491,9 @@ function unitPriceLabel(product, price){
 
 /* price history (deterministic 30-day walk ending at today's base price) */
 function priceHistory(product, chain){
-  const base = priceAtStoreKey(product, chain, chain+"-base");
-  const rnd = mulberry32(hashStr("hist|"+product.id+"|"+chain));
-  const days=30, vals=new Array(days);
-  vals[days-1]=base;
-  let v=base;
-  for(let i=days-2;i>=0;i--){ const delta=(rnd()-0.5)*0.05; v=v/(1+delta); vals[i]=Math.round(v*100)/100; }
-  return vals;
+  const rows = HISTORY[product.id+"|"+chain];
+  if(!rows || rows.length<2) return null;
+  return rows.map(r=>r.price);
 }
 function historyInsight(vals){
   const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
@@ -802,6 +647,7 @@ const ACTIONS = {
   "suggestion-pick":(el)=>{ state.query = el.dataset.q; render(); focusSearchSoon(true); },
   "search-popular":(el)=>{ state.query = el.dataset.q; render(); focusSearchSoon(true); },
   "noop":()=>{},
+  "boot-retry":()=>boot(),
   "open-name-modal":()=>{ state.modal={type:"name"}; renderModal(); setTimeout(()=>{ const el=document.getElementById("nameInput"); if(el){ el.focus(); el.select(); } },30); },
   "save-name":()=>{
     const el = document.getElementById("nameInput");
@@ -927,7 +773,7 @@ function chainPill(chainId){
     <span style="width:6px;height:6px;border-radius:2px;background:${fg};opacity:.85;"></span>${c.name}</span>`;
 }
 function freshnessBadge(offer){
-  if(!offer.available) return `<span class="badge badge-critical">Agotado</span>`;
+  if(!offer.available) return `<span class="badge badge-critical">No encontrado</span>`;
   if(isStale(offer.updated)) return `<span class="badge badge-warn">${ic("clock",11)} Sin verificar hoy</span>`;
   return `<span class="badge badge-good">${ic("clock",11)} ${formatUpdated(offer.updated)}</span>`;
 }
@@ -986,6 +832,7 @@ function offersNearYou(){
     SUPERMARKETS.forEach(s=>{
       if(!isAvailable(p.id,s.id)) return;
       const vals = priceHistory(p, s.id);
+      if(!vals) return;
       const {pct, today} = historyInsight(vals);
       if(pct<=-8){
         const near = state.location ? nearestStore(s.id, state.location) : null;
@@ -1096,7 +943,7 @@ function chainPriceChip(o, isCheapest){
       <div class="toprow">
         <span class="dot" style="background:${c.color};"></span>
         <span class="cname">${c.name}</span>
-        <span class="cprice">${o.available?formatSoles(o.price):"Agotado"}</span>
+        <span class="cprice">${o.available?formatSoles(o.price):"No encontrado"}</span>
       </div>
       ${o.store ? `<div class="cdist">${esc(o.store.place)}${o.distanceKm!=null?" · "+formatDistance(o.distanceKm):""}</div>` : ""}
     </div>`;
@@ -1126,7 +973,7 @@ function productResultRow(p){
           <div style="font-weight:700;font-size:14px;">${esc(p.name)}</div>
           <div class="faint" style="margin-top:2px;">${esc(p.brand)} · ${esc(p.presentation)}</div>
         </div>
-        ${cheapest ? `<div class="price" style="flex-shrink:0;">${formatSoles(cheapest.price)}</div>` : `<div class="faint">Agotado</div>`}
+        ${cheapest ? `<div class="price" style="flex-shrink:0;">${formatSoles(cheapest.price)}</div>` : `<div class="faint">No encontrado</div>`}
       </div>
       <div class="chaingrid">
         ${display.map((o,i)=>chainPriceChip(o, cheapest && o===cheapest)).join("")}
@@ -1175,7 +1022,7 @@ function screenProduct(){
     <div class="price price-lg">${formatSoles(cheapest.price)}</div>
     ${unitPriceLabel(p,cheapest.price) ? `<div class="unitprice">${unitPriceLabel(p,cheapest.price)}</div>` : ""}
     <div class="faint" style="margin-top:4px;">Precio más bajo hoy · ${chainPillPlain(cheapest.chain)}</div>
-  </div>` : `<div class="stale-note" style="margin:14px 0;">Ninguna tienda tiene este producto disponible en este momento.</div>`}
+  </div>` : `<div class="stale-note" style="margin:14px 0;">Todavía no tenemos un precio verificado de este producto en ninguna tienda.</div>`}
 
   ${insight ? `
   <div class="card" style="margin-bottom:16px;">
@@ -1186,7 +1033,7 @@ function screenProduct(){
           ${ic(insight.pct<0?"trendDown":"trendUp",16)}
           <span style="font-weight:800;font-size:13.5px;">${Math.abs(insight.pct).toFixed(0)}% ${insight.pct<0?"por debajo":"por encima"} del promedio</span>
         </div>
-        <p class="faint" style="margin-top:3px;">Promedio de 30 días: ${formatSoles(insight.avg)}. ${insight.pct<=-8?"Buen momento para comprar.":insight.pct>=8?"Está más caro de lo habitual.":"Precio estable respecto a lo usual."}</p>
+        <p class="faint" style="margin-top:3px;">Promedio del historial registrado: ${formatSoles(insight.avg)}. ${insight.pct<=-8?"Buen momento para comprar.":insight.pct>=8?"Está más caro de lo habitual.":"Precio estable respecto a lo usual."}</p>
       </div>
     </div>
   </div>` : ""}
@@ -1217,7 +1064,7 @@ function screenProduct(){
           </div>
         </div>
         <div class="store-price">
-          ${o.available ? `<div class="price">${formatSoles(o.price)}</div>${unitPriceLabel(p,o.price)?`<div class="unitprice">${unitPriceLabel(p,o.price)}</div>`:""}` : `<div class="faint">No disponible</div>`}
+          ${o.available ? `<div class="price">${formatSoles(o.price)}</div>${unitPriceLabel(p,o.price)?`<div class="unitprice">${unitPriceLabel(p,o.price)}</div>`:""}` : `<div class="faint">No encontrado</div>`}
         </div>
       </div>`;
     }).join("")}
@@ -1409,7 +1256,7 @@ function screenFavorites(){
           <div class="faint" style="margin-top:2px;">${esc(p.brand)} · ${esc(p.presentation)}</div>
         </div>
         <div class="row" style="gap:6px;flex-shrink:0;">
-          ${cheapest?`<div class="price">${formatSoles(cheapest.price)}</div>`:`<div class="faint">Agotado</div>`}
+          ${cheapest?`<div class="price">${formatSoles(cheapest.price)}</div>`:`<div class="faint">No encontrado</div>`}
           ${starBtn(p.id,20)}
         </div>
       </div>
@@ -1532,7 +1379,21 @@ function renderModal(){
   </div>`;
 }
 
-render();
+function renderBootChrome(){
+  document.getElementById("topbar").innerHTML = `<div class="brandmark" style="flex:1;"><div class="logo">${logoMark(20)}</div><div class="topbar-title">Ahorra Lima</div></div>`;
+  document.getElementById("bottomnav").style.display = "none";
+}
+function boot(){
+  renderBootChrome();
+  document.getElementById("content").innerHTML = emptyState("pin","Cargando precios reales…","Un momento, estamos trayendo los precios más recientes de cada tienda.");
+  loadRealData().then(()=>{ render(); }).catch(()=>{
+    renderBootChrome();
+    document.getElementById("content").innerHTML = emptyState("info","No pudimos cargar los precios",
+      "Revisa tu conexión a internet e intenta de nuevo.",
+      `<button class="btn btn-primary" data-action="boot-retry">Reintentar</button>`);
+  });
+}
+boot();
 })();
 </script>
 
