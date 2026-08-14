@@ -1,0 +1,1547 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ahorra Lima — Compara precios de supermercados</title>
+<meta name="description" content="Compara precios de Plaza Vea, Wong, Metro, Tottus y Vivanda por producto o por tu lista completa, con distancia y recomendación inteligente.">
+<meta name="theme-color" content="#1B6FA8">
+
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ahorra Lima">
+<meta name="mobile-web-app-capable" content="yes">
+</head>
+<body>
+<style>
+:root{
+  --bg:#FFFFFF;
+  --surface:#FFFFFF;
+  --surface-2:#F6F7F8;
+  --surface-3:#EEF0F2;
+  --border:#E2E6EA;
+  --ink:#151E27;
+  --ink-2:#57626D;
+  --ink-3:#8A94A0;
+  --brand:#1B6FA8;
+  --brand-ink:#0E4568;
+  --brand-soft:#DDEAF4;
+  --accent:#E0A72E;
+  --accent-ink:#6B4A0F;
+  --accent-soft:#FBF0D9;
+  --on-accent:#2A1D06;
+  --good:#1F8A5F;
+  --good-soft:#E1F3EA;
+  --warning:#A8720E;
+  --warning-soft:#FBF0DC;
+  --critical:#C1382D;
+  --critical-soft:#FBE4E1;
+  --shadow:0 1px 2px rgba(15,23,27,.06), 0 10px 26px rgba(15,23,27,.08);
+  --radius-s:10px;
+  --radius-m:14px;
+  --radius-l:22px;
+}
+/* Sin modo oscuro automático a propósito: la app siempre se ve en blanco,
+   sin importar si el teléfono/navegador de quien la abre está en modo oscuro. */
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{margin:0;text-wrap:balance;letter-spacing:-0.01em;}
+p{margin:0;}
+button{font:inherit;}
+input,select{font:inherit;}
+::selection{background:var(--accent-soft);color:var(--accent-ink);}
+a{color:inherit;}
+.app-frame{
+  max-width:480px;
+  margin:0 auto;
+  min-height:100vh;
+  background:var(--surface);
+  display:flex;
+  flex-direction:column;
+  position:relative;
+}
+@media (min-width:680px){
+  body{padding:36px 16px;}
+  .app-frame{min-height:calc(100vh - 72px);border-radius:28px;box-shadow:var(--shadow);overflow:hidden;border:1px solid var(--border);}
+}
+.topbar{
+  flex-shrink:0;
+  position:sticky;top:0;z-index:5;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:14px 16px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-height:26px;
+}
+.topbar-title{font-size:16px;font-weight:800;letter-spacing:-0.01em;}
+.iconbtn{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:34px;height:34px;flex-shrink:0;
+  border-radius:999px;border:1px solid transparent;background:none;
+  color:var(--ink);cursor:pointer;
+}
+.iconbtn:hover{background:var(--surface-2);}
+.iconbtn:focus-visible, a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible{
+  outline:2px solid var(--accent);outline-offset:2px;
+}
+.brandmark{display:flex;align-items:center;gap:9px;}
+.logo{
+  width:30px;height:30px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.content{flex:1;min-height:0;overflow-y:auto;padding:18px 16px 28px;animation:fade-in .18s ease-out;}
+@media (prefers-reduced-motion: reduce){ .content{animation:none;} * {transition:none !important; animation:none !important;} }
+@keyframes fade-in{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+.bottomnav{flex-shrink:0;display:flex;border-top:1px solid var(--border);background:var(--surface);}
+.navbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 0 12px;color:var(--ink-3);border:0;background:none;cursor:pointer;font-size:11px;font-weight:700;}
+.navbtn.active{color:var(--brand);}
+.navbtn .dot{position:relative;}
+.navcount{position:absolute;top:-4px;right:-8px;background:var(--accent);color:var(--on-accent);border-radius:999px;font-size:9px;min-width:14px;height:14px;display:flex;align-items:center;justify-content:center;padding:0 3px;font-weight:800;}
+
+.section-label{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);margin:0 0 10px;}
+.stack{display:flex;flex-direction:column;gap:12px;}
+.stack-sm{display:flex;flex-direction:column;gap:8px;}
+.row{display:flex;align-items:center;gap:10px;}
+.row-between{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.hero-title{font-size:24px;font-weight:800;line-height:1.15;margin-bottom:14px;}
+.greeting-row{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px;border:0;background:none;padding:0;margin-bottom:6px;font-size:14px;font-weight:700;color:var(--ink-2);cursor:pointer;text-align:left;}
+.greeting-add{font-size:12.5px;font-weight:700;color:var(--brand);}
+.subtle{color:var(--ink-2);font-size:13.5px;line-height:1.5;}
+.faint{color:var(--ink-3);font-size:12px;}
+
+.search-shell{position:relative;}
+.search-shell svg.icon-search{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--ink-3);}
+.search-input{
+  width:100%;
+  padding:14px 14px 14px 42px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--surface-2);
+  color:var(--ink);
+  font-size:15px;
+}
+.search-input::placeholder{color:var(--ink-3);}
+.search-input:focus{background:var(--surface);border-color:var(--brand);}
+.topbar .search-shell{flex:1;}
+.topbar .search-input{padding-top:10px;padding-bottom:10px;font-size:14.5px;}
+
+.chipbar{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;}
+.chipbar::-webkit-scrollbar{display:none;}
+.chip{flex-shrink:0;padding:8px 14px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-size:13px;font-weight:700;color:var(--ink-2);cursor:pointer;}
+.chip.active{background:var(--brand);border-color:var(--brand);color:#fff;}
+.chip[disabled]{opacity:.45;cursor:not-allowed;}
+
+.card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-m);padding:14px;}
+.card-tap{cursor:pointer;}
+.card-tap:hover{border-color:var(--brand);}
+.card-accent{background:var(--accent-soft);border-color:var(--accent);}
+.card-brand{background:var(--brand-soft);border-color:var(--brand);}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:12px 18px;border-radius:999px;border:1px solid transparent;font-weight:800;font-size:14.5px;cursor:pointer;}
+.btn-primary{background:var(--brand);color:#fff;}
+.btn-accent{background:var(--accent);color:var(--on-accent);}
+.btn-ghost{background:var(--surface);border-color:var(--border);color:var(--ink);}
+.btn-ghost:hover{border-color:var(--brand);}
+.btn-block{width:100%;}
+.btn-sm{padding:8px 14px;font-size:13px;border-radius:999px;}
+.btn[disabled]{opacity:.5;cursor:not-allowed;}
+
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:800;padding:3px 8px;border-radius:999px;letter-spacing:.03em;text-transform:uppercase;white-space:nowrap;}
+.badge-good{background:var(--good-soft);color:var(--good);}
+.badge-accent{background:var(--accent-soft);color:var(--accent-ink);}
+.badge-brand{background:var(--brand-soft);color:var(--brand-ink);}
+.badge-warn{background:var(--warning-soft);color:var(--warning);}
+.badge-critical{background:var(--critical-soft);color:var(--critical);}
+
+.chaindot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+.chainpill{display:inline-flex;align-items:center;gap:6px;padding:3px 9px 3px 6px;border-radius:999px;font-size:12px;font-weight:700;}
+
+.price{font-weight:800;font-size:19px;letter-spacing:-0.01em;font-variant-numeric:tabular-nums;}
+.price-lg{font-size:26px;}
+.price-strike{color:var(--ink-3);text-decoration:line-through;font-weight:600;font-size:13px;font-variant-numeric:tabular-nums;}
+.unitprice{font-size:12px;color:var(--ink-2);font-variant-numeric:tabular-nums;}
+
+.chaingrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.chainchip{padding:6px 8px;border-radius:9px;background:var(--surface);border:1px solid var(--border);}
+.chainchip .toprow{display:flex;align-items:center;gap:6px;}
+.chainchip .dot{width:7px;height:7px;border-radius:2px;flex-shrink:0;}
+.chainchip .cname{flex:1;min-width:0;font-weight:700;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11.5px;}
+.chainchip .cprice{font-weight:800;font-size:12.5px;font-variant-numeric:tabular-nums;flex-shrink:0;}
+.chainchip .cdist{font-size:10.5px;color:var(--ink-3);padding-left:13px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.chainchip.cheapest{border-color:var(--accent);background:var(--accent-soft);}
+.chainchip.cheapest .cprice{color:var(--accent-ink);}
+.chainchip.unavail{opacity:.55;}
+.chainchip.unavail .cprice{font-weight:600;font-size:11px;}
+
+.store-row{display:flex;align-items:center;gap:12px;padding:13px;border:1px solid var(--border);border-radius:var(--radius-m);background:var(--surface);}
+.store-row.winner{border-color:var(--accent);background:var(--accent-soft);}
+.store-row.unavailable{opacity:.55;}
+.store-info{flex:1;min-width:0;}
+.store-name{font-weight:800;font-size:14.5px;}
+.store-meta{font-size:12px;color:var(--ink-2);margin-top:2px;}
+.store-price{text-align:right;flex-shrink:0;}
+.badgerow{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
+
+.qtystep{display:flex;align-items:center;gap:0;border:1px solid var(--border);border-radius:999px;overflow:hidden;}
+.qtystep button{width:32px;height:32px;border:0;background:var(--surface);color:var(--ink);font-size:16px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.qtystep button:hover{background:var(--surface-2);}
+.qtystep .qtyval{width:28px;text-align:center;font-weight:800;font-variant-numeric:tabular-nums;font-size:14px;}
+
+.listitem{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-m);background:var(--surface);}
+.listitem-name{font-weight:700;font-size:14px;}
+.listitem-meta{font-size:12px;color:var(--ink-2);margin-top:2px;}
+
+.empty{text-align:center;padding:40px 18px;color:var(--ink-2);}
+.empty svg{color:var(--ink-3);margin-bottom:10px;}
+.empty-title{font-weight:800;color:var(--ink);margin-bottom:4px;font-size:15px;}
+
+.sparkwrap{display:flex;align-items:flex-end;gap:12px;}
+.sparkwrap svg{flex-shrink:0;}
+
+.divider{height:1px;background:var(--border);margin:16px 0;border:0;}
+.link-btn{background:none;border:0;color:var(--brand);font-weight:700;font-size:13.5px;cursor:pointer;padding:0;}
+
+.modalback{position:fixed;inset:0;background:rgba(10,16,14,.5);display:flex;align-items:flex-end;justify-content:center;z-index:20;}
+@media (min-width:680px){.modalback{align-items:center;}}
+.modalcard{background:var(--surface);border-radius:20px 20px 0 0;max-width:480px;width:100%;max-height:82vh;overflow-y:auto;padding:20px;box-shadow:var(--shadow);}
+@media (min-width:680px){.modalcard{border-radius:20px;}}
+
+.freshbar{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:var(--radius-s);background:var(--brand-soft);color:var(--brand-ink);font-size:12.5px;font-weight:600;}
+.stale-note{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:var(--radius-s);background:var(--warning-soft);color:var(--warning);font-size:12.5px;font-weight:700;}
+
+table.plain{width:100%;border-collapse:collapse;}
+.scrollx{overflow-x:auto;}
+
+::-webkit-scrollbar{width:8px;height:8px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:999px;}
+</style>
+
+<div class="app-frame" id="appFrame">
+  <header class="topbar" id="topbar"></header>
+  <main class="content" id="content"></main>
+  <nav class="bottomnav" id="bottomnav"></nav>
+</div>
+<div id="modalRoot"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------------- storage ---------------- */
+const memStore = {};
+const storage = {
+  get(k, fallback){ try{ const v = localStorage.getItem(k); return v==null? fallback : JSON.parse(v); }catch(e){ return (k in memStore)? memStore[k] : fallback; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){ memStore[k]=v; } }
+};
+
+/* ---------------- utils ---------------- */
+function hashStr(str){ let h=2166136261; for(let i=0;i<str.length;i++){ h ^= str.charCodeAt(i); h = Math.imul(h,16777619); } return h>>>0; }
+function mulberry32(seed){ let a = seed>>>0; return function(){ a|=0; a = a+0x6D2B79F5|0; let t = Math.imul(a ^ a>>>15, 1|a); t = t + Math.imul(t ^ t>>>7, 61|t) ^ t; return ((t ^ t>>>14)>>>0)/4294967296; }; }
+function rand01(key){ return mulberry32(hashStr(key))(); }
+function normalize(str){ return (str||"").toString().normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9\s.]/g," ").replace(/\s+/g," ").trim(); }
+function formatSoles(n){ return "S/ " + n.toFixed(2); }
+function haversineKm(lat1,lon1,lat2,lon2){
+  const R=6371, toRad=d=>d*Math.PI/180;
+  const dLat=toRad(lat2-lat1), dLon=toRad(lon2-lon1);
+  const a=Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function formatDistance(km){ if(km<1) return Math.round(km*1000)+" m"; return km.toFixed(1)+" km"; }
+function levenshtein(a,b){
+  if(a===b) return 0;
+  const m=a.length,n=b.length;
+  if(m===0) return n; if(n===0) return m;
+  let prev = new Array(n+1); for(let j=0;j<=n;j++) prev[j]=j;
+  for(let i=1;i<=m;i++){
+    const cur=[i];
+    for(let j=1;j<=n;j++){
+      const cost = a[i-1]===b[j-1] ? 0 : 1;
+      cur[j] = Math.min(prev[j]+1, cur[j-1]+1, prev[j-1]+cost);
+    }
+    prev=cur;
+  }
+  return prev[n];
+}
+function isLight(hex){
+  const c = hex.replace("#","");
+  const r=parseInt(c.substr(0,2),16), g=parseInt(c.substr(2,2),16), b=parseInt(c.substr(4,2),16);
+  return (0.299*r+0.587*g+0.114*b) > 150;
+}
+function esc(s){ return (s==null?"":String(s)).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function fmtTime(date){ return date.toLocaleTimeString("es-PE",{hour:"numeric",minute:"2-digit",hour12:true}); }
+function formatUpdated(date){
+  const now=new Date();
+  if(date.toDateString()===now.toDateString()) return "Hoy, "+fmtTime(date);
+  const y=new Date(now); y.setDate(now.getDate()-1);
+  if(date.toDateString()===y.toDateString()) return "Ayer, "+fmtTime(date);
+  const days=Math.floor((now-date)/86400000);
+  return "Hace "+days+" días";
+}
+function isStale(date){ return (Date.now()-date.getTime()) > 24*3600*1000; }
+
+/* ---------------- icons ---------------- */
+function ic(name, size){
+  size = size||20;
+  const p = 'stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
+  const map = {
+    search:`<circle cx="11" cy="11" r="7" ${p}/><line x1="21" y1="21" x2="16.6" y2="16.6" ${p}/>`,
+    home:`<path d="M4 11.5 12 4l8 7.5" ${p}/><path d="M6 10v9a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1v-9" ${p}/>`,
+    list:`<rect x="4" y="4" y2="4" width="16" height="16" rx="3" ${p}/><path d="M8 9h8M8 12.5h8M8 16h5" ${p}/>`,
+    star:`<path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 5.9L12 17l-5.2 2.8 1-5.9L3.5 9.7l5.9-.8z" ${p} stroke-linejoin="round"/>`,
+    starFill:`<path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 5.9L12 17l-5.2 2.8 1-5.9L3.5 9.7l5.9-.8z" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>`,
+    pin:`<path d="M12 21s7-6.3 7-12a7 7 0 0 0-14 0c0 5.7 7 12 7 12z" ${p}/><circle cx="12" cy="9" r="2.4" ${p}/>`,
+    chevronLeft:`<path d="M14.5 5 8 12l6.5 7" ${p}/>`,
+    chevronRight:`<path d="M9.5 5 16 12l-6.5 7" ${p}/>`,
+    close:`<path d="M6 6l12 12M18 6 6 18" ${p}/>`,
+    plus:`<path d="M12 5v14M5 12h14" ${p}/>`,
+    minus:`<path d="M5 12h14" ${p}/>`,
+    check:`<path d="M4.5 12.5l5 5L20 6.5" ${p}/>`,
+    clock:`<circle cx="12" cy="12" r="8.5" ${p}/><path d="M12 7.5V12l3.2 2" ${p}/>`,
+    trendDown:`<path d="M4 7l6.5 6.5L14 10l6 6" ${p}/><path d="M20 11v5h-5" ${p}/>`,
+    trendUp:`<path d="M4 17l6.5-6.5L14 14l6-6" ${p}/><path d="M20 13V8h-5" ${p}/>`,
+    info:`<circle cx="12" cy="12" r="8.5" ${p}/><path d="M12 11v5.5M12 8v.01" ${p}/>`,
+    sliders:`<path d="M5 6h14M5 12h14M5 18h14" ${p}/><circle cx="9" cy="6" r="1.8" fill="currentColor" stroke="none"/><circle cx="16" cy="12" r="1.8" fill="currentColor" stroke="none"/><circle cx="10" cy="18" r="1.8" fill="currentColor" stroke="none"/>`,
+    tag:`<path d="M4 4h7l9 9-7 7-9-9V4z" ${p} stroke-linejoin="round"/><circle cx="8" cy="8" r="1.4" fill="currentColor" stroke="none"/>`,
+    store:`<path d="M4 9l1.2-4.5A1 1 0 0 1 6.2 4h11.6a1 1 0 0 1 1 .8L20 9" ${p}/><path d="M4.5 9h15v9.5a1 1 0 0 1-1 1H5.5a1 1 0 0 1-1-1V9z" ${p}/><path d="M9 19.5V14h6v5.5" ${p}/>`,
+    scale:`<path d="M12 3v18M6 8l-2.5 5.5A3 3 0 0 0 6 17a3 3 0 0 0 2.5-3.5L6 8zM18 8l-2.5 5.5A3 3 0 0 0 18 17a3 3 0 0 0 2.5-3.5L18 8zM7 3h10" ${p}/>`,
+    walk:`<circle cx="13" cy="4.5" r="1.7" fill="currentColor" stroke="none"/><path d="M10 8l3-1 2.5 2.5L18 11M9 21l2-6 1-3M14 21l-1.5-5L15 13" ${p}/>`
+  };
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true">${map[name]||""}</svg>`;
+}
+const LOGO_DATA_URI = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAADwCAYAAAA+VemSAAB2yUlEQVR42u19d5wdV3X/99w7897brl11S7YlF2xL7hIY2xitMNjYNIPZdag21ZAQ4MePQCDA7gIJJZAEEgjtFzohu6HHEFMiCVyx5a5i9S5t0bbXZ+be8/tj2p15z44x2JbtOXyEVd7ue/venDnnnvMtQBZZZJFFFllkkUUWWWSRRRZZZJFFFllkkUUWWWSRRRZZZJFFFllkkUUWWWSRRRZZZPG/BDNT9i5kkUUWWWSRxeMdD0xP9zCzzN6Jp16I7C14ygYBwMDnft75ic/+7Dq/k85a6SyBs3hSRF/fsACAXZPjz7l3885VRKSpvz/7vJ9iYWVvAZ6SQysi0swsXviX//LeA6NTkwKAzt6arAJn8aRJYgHgjB2796wlcqucvSVZAmfxJDn80iARkXr1h79z4WQVaG9vcbIEzhI4iydJrFvXK5i5ZfOeI68sowDKtWZvSpbAWTwpYmBA9Pb24ts33HHegYmp58CrAayyFVKWwFk8GWLNeghB5H39v266sliqtrFbhqo72RuTJXAWx34wbdgw5GnmwujY1Kud8iSEdqGVyt6aLIGzOPa750Fi5sI7PvUfaw5OlpYLy3YhLGiR4TeyBM7imI+hoSEG4GzZc+TtJUdBWgUNqwW2tLM3J0vgLJ4EjCO+e9uBs3YcGHu+0gokhIS0IGQ2w8oSOItjOnp7eyUAfP4/1l01Waq1WcSKwQTWUDo7A2cJnMUxHRs2rFfMLG6+d9cLKo4HAhMrF+zVoL0sgbMEzgLHMHFBAsTv/+KNz56pqIugFQMQrD3Aq0NnKOgsgbM4dmMEI2Bm684Htr92uuqREEIBADEDDAT/lwUyNlIWOCaZRwrA/J37D13l1kuwBISfuwIghkC2RsoSOAscm8OrQQnAe/Vff/WKyWJtMSlXMQtJBEBYgBTZFDpL4CxwzA6vhrQtCVv3jr+6Wq2yIAZDg0gAUoLsHIiyjzk7A2dxTLbPzExf//ld5x6anO1VShEAH3fFDBABQkA0IrFozZoBC2sGrDVrBixkUjtZBc7i8Q/q7xc0MqKueO9X+mddzgvbUsxaEhjMQRL7v2nI/Q0bhjwA2AAANJS9mVkCZ/G4x8iI1sydp7xy6GV1x4EkQZoZzAwiBmsP0BY0Aijl2Apf6O4ffzRn497R18wUy5STFp26tOeXX/rI6x4EmADKRtZZC50FHpfdL/DeL/5szdRMdQWpumaCABEA8rtirQCvBijXn0NvGFLM3Pas80+4dOP2Q/+ycdfEP9+96/Dnt+w+cpH/TUey6yGrwFk8XttfSeANt21+5Wy1DiLBBAJIgMFR+8xeHVrnKch6AaD2wM6Du5VyStVaOQ+hqFLP17P3M6vAWeDxog0OiJGREXXzgxNLxyZnXq6cCggQ0WmXCCCAwFCug4XdHT2aOYcRgIjU9KzrEOs8EUmycpZkKxtiZQmcxeMVmzevJGaW//C1H71osux0EFFAXEgeXxmAtCyMHp2ZEkI4q97aLYgIvatPPZdUnVi5gLAhctmeOEvgLB6voJGRfg0AD+4bfVW17rCUsmHqTACIBEjmwCw1M2PjRoCZcdz8nstbc9LiesUj7QEZ0CNL4Cwet/aZAPCHv/arZxyarlzEDGIISeBggKxBrP36KyRgt0Dmc2LNmgEL7XW5Zct4h8zJc7TnAV6NoGpgpQTWDFgoHrawZsAC+iTWrPF/v2bACgdmWSAbYmXxx8X69RAA9C33PPjqUs21pWDFzJJBIK19RyRm/78kASsHaeerv/X3vt7pp3+Dp2bLm6uuewZJSzAzWlpzRWz4oAfAC+/qvAFgf0uMkextP7YNsLLAk0a0LhDeKJx81Yfv2j02e7pFSjMgoBkcVF5/Gk2AkJqsvGgrWPeAeNipzFqLejpaVp58wjN/efvW53hKFwQ0li6Y84uZinuzp2E5nvKWL543b6ZYrMyWyhWWLblLn336lp9/6i3f97T/5NnnkFXgLPBodr8jggjq7Z/+0SWzFed0oerMUgo/qxgkyMdihAkMEqxdlGs4l6DPZRfYO1rCrrFtkHYBkIBWLvaNl66QhCsgLMBuwfaxMsjzIFnAKU9hyZyW3a7S+4joluHhYdnf358pBGRn4Cz+0NjV/WvBzK33bN396umKy0JIxczQIe6ZKVoh+QVbA6yhvDqgFYgIUlqwbNun+BNAQkLV63BmjsKZHYdTmoRXr8B1HThODXp2AsSKAHQFd5Hsg8gqcBaPgrlAG4m8HR/69IkHRidfrJVDkiBJhwchv3VmZrCPxQKgwa5GT1d7qe7q39eQ8wBPLe5uOWmi5J5Wr9XAnotTl/aUu9sW1ut1R3kadZI2k5AAsRLHz7WUlrcAuBnM1JeZHGYJnMWjaJ/7R8Qws7jqfV/rnayquT6JnyURgUPyAgUKHOEqiZX2ajXxrAvOvOeGz7/zBgDfBvCsPYePXnXmNR+bZ2l3rlcr4QNv+LPfv+Gq5z6ggPslMAvgSHBbIABVAHcSkZcNTbIWOgs8KrtBjIz0KwAt+w6OXlurFCEorLF+zlLUQgfHXz+P2crlcGBschzAL77whZFqrYYHD4xO32ELtrXnsp3P4eY7t/0SwLst6v+3Q4cO/Wzr1om7No2N3bl1YuLOjRs33kdEHmeUwyyBs3h0MfARLQDQB//5Z8cdGJ+5QGvFYCWI/Q+QItkrDrMZIAGQBZlvw/h0aYqItrzjHb+ut7TQjs3b929uyck2pcF2oR337zmyl4g0+vqwZMmSyhlnzC+euXBh6Yz584urV6+u+PcQyqbPWQJngUfluNBPAPi2LXtfV6wpWwihworIia1O2PWKYAdsA5aNXC5nMTOtWuWLAJx72om9rut6ZOUIdgEtba2SAGTjqSyBs8BjMb8aZmaeu//I0T9zXAeCIGOaPkUjKzIOqSSC/2OGUpqJiDeeNKXDT52FYBYSEBJEzFl5zRI4i8fI7xeA+OS3f/2iiemZ5YI9zSAic10UYJ9BcSvNzD4fmBWYlf/vIyMKQLvj1Mc1pBJCEGkPGU4yS+AsHsOQRN5//HLjmnKdiQRphHrPHA+5EE6iQyIDByMu7aUXP1Qu1adBxAwGKwfKzXAZWQJn8dgYlg0N6Vu27V86OV28Wnk1H+BM/tmXjdlVuE4K22mf1O/nOoT/d2vWDFgASv9z//YHbEE2K1czABVJBGSRJXAW+BNrPuOz/++XL5mseF1EpHz2URrMHrTMIQuYOTobkxCQ0l/3l0qHiYg0HBcELaC94OuzJjpL4CzwGGg+K2amHQdGX1OplFkIiYhOwH6b7HfT/nlYUBOmARnr21WrAADPf/Y5K4UkYu2fj+MaHBy7mbPrIkvgLPBHyuYwM/7u//1y5YGx6WeBPQJYUoKbBBAFA6xAkINMOY4ggalRFzp4rACRhBTJCjxEpDPgRpbAWeCP2f0OAUDhts27Xl+sOrYgoTgAapDRPnNkXhbXXjYzOIRrGaGU8r9Q+rtiKf3LYM2KTQQA3z645/wMuJElcBb4I4ZXAaZqy+7Rq+uuCyL429qArBATGMJjLyfhHGQcidMG31KChAALCxRcAsxMB3sukADww6PT1//72NiHmdkK1lhZZAmcxSON/hFfn/m9n//JldOlyklgTzMj5v1GtqGIZtE+Fjr8+0SjDZ2qpTZp4bONLDAzXM9hIuIdk7e7zJx3HfGM341NfwRAK4aGsnY6S+As/pAY6d/EFoHv2LTnmumqy5aUHKZqDOCI22k2vJA4Zh9GnGAOh1QbN/r/2bJ7m2bSlm2LanFG9z/v/KuYeQmGhjSA1tWFllVfe3Bn+ftjY/PBTIMZCSlL4CzwiIdXwJC+Y+/Ekj2Hj65VrkPm52RaHYW/pcTMilL46Ma4f9u+2ZDzoCoVNa+r7XQAy8OnUMz7uL2z6ztHpt4riXjzyEiWwMj4wFngkYnWMTP3feBbL5uqenMltGKQZJNxlGqR4atgRRlO5uqIuWGI1d5akACgXIft1oK9edeh3wC4A7765Mwd1epNnM+tvG+meNWd1eqnzmtp2QNmQjbYyipwFnjY4dWGDUMKwPzdBw69tlwu+coYbFqOkYnBihlIBn4jFLcLB17pNdLUbNljraA9h3M5Czfccv/viah+ynPaLSLimlKORYxRYS36wPbd1zJz4a0bN2Y3+yyBs3i4GBwcJAD8sX+7cfH+8ZlnQSsAPqgivSRq+OiIfBAlm001g0hAkEgAOS577vmLhVYEzwFAaGlpkWZRt8CCbAvObFHvmiq+3QXO+crq1W7mI5wlcBYPE0MALEm484Hdb5qp1KUQpJiZOInMMNZFFLGQEude4kgbC0QgywdqbHzweywE4dxTl71AK0eDFUjasGQ+8eUMZnguhFtTu4+MLvzekSP/yMzn+LzDDKWVJXAWaKrRPTSkXU+3P7DryJVOvQ5iFmyce4kYbBxoo3oYCbnHFMNIqYNEdAZe4+u0o7XFPrNg2zY0aZJ25KySmyyxJAITCV2tAPU6ubU6f/vBXat8ghOLTBc6S+As0NTvVwCg6/92ZM10pX4yiH3BdsTsBWZAkAjyNNgHR3qUhrhdYm7FUXXesKYXzIzZUu2equO5sCzBxsBr81C/52ndemZ76zn1UhEQENRS4JtmK+Ivd+w+G4CkwUHK+ugsgbNIxcjICGwJvmfn/tfNVh2WIi6+DE7AqziiDMZjLTCDmII9cSTsDmgFrTz/gQs2s9Zsl0vlQyAJCAvQCsxemJMaQP44y1oJzwPZOaKWFvZaO6z145NvQcB6yEpwlsBZpNpn5mGxdd/kcw6NHX2hVg4RkUhgnGPz36AiU0QljNrpyJQhOB0TAK3BOqHI0ao0e65mh6QloBWqlZpnvBZd0TwNywakAFuWVK6rx2E956MHDlyBoSFes25dNpHOEjgLs30WRO4HP//jVVMlt0v4PD+KPI7YpOlr+GMt9isxieAsTAlWUliBm8yN2dFejYRFRATlOjj1+PmLLSmAgPB/T6my3u6aA0VCgxlCEo97CiP7jlwvAd6wfn0m7p4lcBZx+9yvNbPYsufAa6q1MohEdG6loHXmKEH9JA0hlcSxrJ0/eebUZKwhg8kmmQMYggie6+DkxXNPzucswCf8q4qnZq18HgRi0hrQWuqZGR6t1q/457GxS3hwMOMMZwmcBRDzfv/qn244e//EzHlgxcxKxphJipBVbAyamUMjBvarbmLFxEZrLQAI/099fRJAZe/h8V1SCMnaYyEFZsvOtFI62hNbFEh0hOQI5UGCMT45bW0+NP5dAIuHiPTAQJbEWQLj6c779TNv894911YcbREJHdqjcATMCOGRBOYAiUX+rwg2GboyhF8Tfp0QkLYNAFiBFZKI3Na29hZLsq2Vx3augI1bD26pOR5OWXm8AADlL5KjtTMrBe06gNY8sv/Q/J9PTfUwc25wMJtnZQmMp7dhGTCkAbTt2DfxSsd1ISLYVFBpk3qxBoCDYkUsMvm/RsUOUFmh4sbmXYeZiLB8cfcZ7HnM2gdyyIKdemEaUAqh1lbANSZIoaftfOGf9x96MwCXMrOkLIHx9MZOEjNbb/74d688MlVaKsA6Praa515OyVtR1CWbA6uGTzSo5OHEaU37YgaAnu6Oy1rzloTSCqK5oB1rDVY6quQQAkJKUdcad03MvOLuev0UBvIZvDJL4Kc1dtKWwtu4dV9/xfUgKOTeU4BtJoOfT4F4nT9ZZopNzQQQsB3IgGcRKHBmYO2n8AasBwGYLdfuLNdcD0JI9p0b0vXX9xbWGszafx1CgC2LSClVzLcs/cTuva+RRDUMj2TXUJbAT1/e7w23bFk+MTVzmXLrYEDGTKN4oszmQAmNwy3Nhr1oWKojWKVGeFtYsaBXaGaMHp29T1iWgJBRdU8kMBMhSHoK5HpC51ISgqqlIt89NnGtYp6D/v5MsSNLYDxdeb/0z/9585XTNbQLQHE8Tg6QVSFckg3EVYJ0AJjuhBGdkAzPJIJmH6fRsuswA8Dtd2/fpSE0STtxtg4ldU5oyS+t1+ogQIRs4+j+wFpQra4PKlr2yi3b+gBwKAGURZbAT5tYsGAlA2jZtmvfNZVqBSREVA05kMcJfzEDTBwNq+IRFiUKbmRsFk6jI4WO5Md8x6ZtMyQEIhZDKHo3NMQArA7LmsNK+a+JKEJxMgFaKRBA1dkSbz48/m5mtkf6+rTRu2eRJTCe6sgrOTLSrz7xnQ0rZyrOxVAOAyzD4RRFBH2/jRZhEqVwyAT2GUocT6Aj1FbYQgfkBwDYeNKUZub8q664cLnyWMVM/4RqpeiR4jj48EsSQoCFiITk/R00C3iKD2qsuH7btstAxH3ZWThLYDxNVDdGRjYxMy+4876tb5oqVYUQlmoQ2CDTKcXAQxtTadNeFBQrdRirH9+xIeADB+ZHWml2oxE2EQxrFQLgHnC87cjlARKclOsJXg8BZFtcVoy7J4sfYGbZl7kLZwn89IkhDYA37zr0EqdehSCW/qBIx3kFoyeOcVWG1kZSI5pgMpECIAj7ayAZOat0CyJyb/jVbYcEsQWtGKoB1kw5SbbJLeaE/nQE0JSqXtN7K/WL/37fvhf395PK4JVZAj/lo79/xOf9/t33Lj4yXT1OCNKao9NrdMZNateFgI0kVJINLeio6nLM9KdwHZQCTM2ZO99mZvYF3432+a1flgCc0bpzxM7ng5EZR0MsNu4PmhkC4AlH4T/3HLiWmZdn6pVZAuNpQFxgS4Af2HXk2nLNhRSSA16RyRiMql5ECzRcCClNUaBg1WPWa+MBOlVki+Wa8ve8XmKNdMrK4wURqUnHnbJyOb+IR+24X+HZ2GYxQ+rSLB+uey+91XGeOdLfn1XhLIHx1N79MvOPf7fpxD2Hx5/neQ4Y4QVPyfUQxWdYigZU5sE4nDRTapfLSOZ8DOQI45wzlrXH1bkx8kQy9U2i/1K4zgp7BsvSBzXJv7zzvguZOTc0OJh90FkCPzVj8+aVBCL+wg9+e9VMTXcKYmWucWFQA8HmGZiSMMqkvVnajtD4I8XIKkOV8oKzlp8mhRBhyVfpQRtC31JT80MH6yzEEE8wQELouoOxWv3NI2NjPRga4oHMTylL4Kdq+8zMPQeOHH1VtVqDEIISKUkG7jmsnpzQbw/4/ca+OEJhhe1t0h+JQQ2UIf9LYhNwmTL41tr/v8RTs2k3THFrQL4uwBhZ7V8+ePgNAHjzypXZWThLYDzldr8A+JPf/J8zD04UV0E7vkRrOHdqwFalEtkgJxhwaaSOwjHkMirSooEwpFL+wbLZRcHm1NmQCTDEBDgellG9WOLdU+V3zjDPHenr01kVzhL4qVV9xzYRAfyTdXe+rFTzLCKhIsG6CE1FIVAiJiyQQeQPIFHhMClGXnI0paZUVvvGSsmPWcJkMFHTqyAcisW/gueleJgWPk5rFlCeHtO86B1bHnwLiHgoq8JZAj9VgsGEDUOeZu48MjX7Sq9ehSCIpGBdLMZOCPn6SSy0CaYIEzVMLAIbehxJfQ7dZFgV3gyaXQHaYCxGz01JEIn//HGSCympVHf5ztGjr2Pm44czYEeWwE+VGBwYJGa2r//k9y6fKtZOIGjNgGBwIodjVAaBDavQhFdZcjOcqrWcqKCMhxOBjQXzVLMWW3NMY2TDDYKoqdELCxKkPD4srBVv37X/kr4+ZOqVWQLjKSKbM8S2JPeuLQdfXao5TBRqPofTZW4YIJuQDV9pkgPko3/+1NyYrCF2moxvxMwNqhmOo6A1+8/NDOU6TWowR5pbZEy/iWJ9TKKAc0zkdwtS8EytjvUHD7wFwLwNa3tVRvjPEvipgH+2brx1+8r9oxNrtNYEgqAILslxiaWIgOufQWPjwSBZzPY4bpopRGSFmtHG/paaFGEpEZ+jH+qyoDhJTb4ia44lfcy/Z4CVllyp6nFH9/797n0XMqMw4Bu2ZZEl8JM1+iQA9Y2f33Z1sa66BbFis6jBr15+FYPvrhDimtms0imZWAOnHBLuEwgsNjDTlE5gGRORiCClbJxmN9knw0B9mRU+/jNDCOKpuotfjE28A4A35FMUs8gSGE9OwzKMaAC4a+vul1WrtXjVYypuGKCnEL8RcoJ9iTuT5x/6H3HCpzAkNMSw6hiK2fRDNu4KskEXSxunak409VFVjibVQWcQ57DUdYfvK1Yu+fT4+FlgzjSkswR+UhuW8d99/TcXjx2dPZe0wxRscZiNM6qZI+nJFcfT3gR5P1UYuQG2Yba4zbxckvrRzafnMNZSjZNwRCul4HWFAgCC9CxT/sa9h94jiTgjOWQJ/CSNETCz/OUt97xypq6EkJbiNFYZofOCD4ygZm0sGvVbGUYra469muSkhm6Wmw9zaBeGFnWMH4l2v+E5nJPWLfG9h4RbrfGD08WX/KRaPSkjOTx2kY35H0PiPhEpAN37xmde5noOrEAFkgKJHApnvIYHsDlFpgRPwUBjJf4tuf2NhkscQyXTwyoC2yaUslnjn8BhBzcdDs7ocYufnMEZQgNErNVRO9f5xa073szMH+pdv16YsOwssgqMY1vyeZCYufDnn/yP50+VnROJoZmZTLBGopWlGI1lrodMGCMlWmiK+cOGTlYCxkExFgsAsHEjAGDXkfF9WjOToKb5K6B9fyZOdgj+EwVWpsbzx6qZDI7O9ixq0zO8eXr29TVg2Ya1a71MvTJL4CfN8Cqcvt6/89B1xXKVpSHxHClvgIJKbJiFcrrRpWblEabuXdw5By0tG5NnogbM9E9/e/ch1popwThqQI9F4ngm15jT1Ecmv5U2O4Bg9k1a6zEPS968eetLmLmFspVSlsB4cvB+CWD84Nf3H7fn0ESvUi4BLIiREMah4ByZmF41+JXEMjpmDx1PgsM85wTgwiQ+pD/kJV3duai1ZobSKSxWMIwKbwoh44kSld14hZRcOxECAoUQVCmW+Z4jR98BIM+Dg5wBO7IExrGPvNpMAPF3/vu2q6fKtVYpoAAijvEWkTyOv+plgEWUUNHyxti5EggQZFRcbtjVhusoSgvChx9zwAd+ce+5pwsJ38mFqMlFIfzddITkEvHNJPx7mOdfY+BFHLXbgUk573f1Ke/atvtlwQvJEjhL4GM71q37c2LmuXsOj76q6ngQwoo3L6kC5hMRRFBBDZ5vdOalREvNoUoVmS03x+fp4N9juqEGRHJ2lJdUiPOfmpIZOHJFbOgZ0tIBwZiLo110yIxiAsgSXALw69HxNwFgZIodWQIf67I5a9euVZ//j5vP3n+0eBZYMYOlaV/UuA5Cgg4Y0grTrXTCoSHhVmgYBlOTLjc1+9UkdEIhIHUVeEpr82xspiw3OSuH1EZic8EdvUSp63U97qlL3rt3by+GhnTf8LDMrpQsgY/N9nnzZmJm6z//Z+NLSjVYAlCRPA2ZJHnEiKpwHYPUuTa16kmoYXC4cjLhk3GC6QSb92GAYkJGutBdhf2amanDlu1aeUCDKogvMu/7EqNhzZTYiBkqmQTwhAJ+fXD8rRaAkb6+DF6ZJfCxGEwYGVEAlhwaHb/arZdBCd6vQd5HTOCPBdZTEjpIEgiZyajE8UKYw92scR72SQj+MEqlS7AMucACRCJS5Nh4/fUKQOG4Qn6J4zgQxvXBiem0SLb1FA+4KLXyClp8wTMzfKRSv/rvp6bOBZHOgB1ZAuPYg076ms+v+sD/O3ui7J4AVhoMAZOUz2hQkGQy90dxdUtveGJEVDMpO2oOsxSyAXclmASEBYjmOB4VWwpHqyEy4dMGUYKIYx3rSDuaohtOxPu3pDrKsIYf3PlWZqYhQlaFswTGsSZapyWBdx2cuK5cqXKo+dwAg2QyRB8pIXZBJugZlPI04ThJDckbUBKzTIkqbZAeAiDHHQ/s3saaNYjAWjeskaQI+IRESeGA6EVzPIE2dsnRvthEi8W7aOmVK3ygXHvN3fX6KcyQGbAjS+BjKYiZ8zfcdN/pe49MXKqVokjzmYzxk3E09eVjY7nWWAEjNC6LJ7/kkwQM/HOyy9aakx9pRJLgho/53q37ZuOVlTJbCAKgXaVrIqAYkqEMwgbJIhbmoBT3mBrVOsKTg4Ce0Ogc2rzjWgAyA3ZkCXwsNdACgPu1n975ytm66pTEKtj3NOCo0rU1whQ3ofqR4cgQD7xShAijbU1ipv0bRHqO1dFdkD4kUiVsG055zhssIqrvqdT25woFaB/+mZa9TPTwDXBLA9xBxlk4vINVK1W+d2rq9QAKGBzkrApnCYxjY320ggHI+3fuf3nd9aIJFUPHQAvmxiVQEyBFMyZSzAYKARtkaEOb8vAUY5ahwbrxqDl6eNaF1n4CNxG8E/Cpgf6PECtlRnhnk8RvMKPCfXDyTB8BK8GAIKX0URbHX7t561tAxP3ZNZgl8LGw+x0cHKQv/uDWy8enS2eRdnWkS5Mg+FBwoQfAiHSVSrgABwmYkNdJznoT2GPj5hDCuMIhUjRnDpBYV1123glEIFYKDIajVNOLwhyWxcMrSmyEYyJFLO8jOJ5Ac/qWJCUVqzW+/fDYdcxcGDHk87LIEhhPlGWKIFLfufH3Lyi7ZBMEc1oCJz1QQrKKUkPFjQ3FKKmik/x6Y1/DiQFW/Kw6NfBdtnD+cYJACJxd0pI6EAYgAymNATZ30Ww0ETHlkIPdUnogHvxBwHX1qMitvP7BHS8DEQ+uW5cBO7IExhNo2N2v7to9NefgkfE+t1YCSaJ0mxmBIhIcXzJ2tpy64Kkp954S5+PEkqdhXRTtgtNIK5DLhr5zg6SODv1VOIm/MhhQIXQyEhYgc5UUH9ApUcb9H17YNmY8D78bG7/eImBo7Vovw0hnCYwnyu+Xmds+/50brp4s1RfBx04KkDms4oZWMqmKlRTS0KwT6xhD6cJYPVGQKGZl97+jMPKfhESjuUrY0Us/wVPHYBeaI98l6FhiIAZmJHjAnJKaJsTcYHPwFd3QtJZcqfKYq9d+ev+BlzBzZ3DDy5I4S+DHL4j83S8A64Ht+15dqVZZCBGbbid1MmLJOTLsShI7F46ZPUaXSsYgK57ycixsRz5TqdFVKXgW8RAfs5A+mCP459ziEjMz2RA2sw4UMylBbCSK99gh/DM55EJCSZqZGs/RPiRTTzsefn5k4noAHlGWu1kCP87xkY8MCAD88a/8Yt6+8eLFWjMBLNmAUnHUMz/cqIaApthljpKgUeyKkpRBZmOVlMQzpv2BoZSfvNIOsNDBWb6/3wOQP7Gj9cR6vQ5BENHPYtAfE4Or0K/JrMJsTMPTpItYGF6ousP3HJ153nemplYxsySiDJ2VJfDjF0Pr/fdv3X07XzNbructXwMrdW7kCH2VfLsNgh6hwec3GklRMwJfnAzRiqm59h3A2gB5hC9JC5AAkwShwZ0w5gwGAzQybi6CYuWP6AjAxn9NSxc2ReiNlRmFvqTQ02S1fGP7nrcAEJkVS5bAj+vwChuGFDO3Hjxy9DXVeh0kOJC40pEgO1GID46aUKPRJUNdkhomzGRe/CHnNuIMJ61ToqbVlKdl9n1+2UtAKe98YM+DzNC+xzc3eCM1WC0JikX4mJKqINzMmQkpt0Ru9HXybwzCK5d58/TslffDOX1Bby8jsyXNEvjxGl4B4Hd87ocXT8yUniHYYwZERAskAz0VJapZZyklCWsocRirmmgHbK6gDD5iGvTBaUJwkwp8/74DRV8qRwPKA1JYaGr4HimtLKMDoISNCyWGaRQNwowNN5vDLyYC62m7MPej9+183Q+IFDJb0iyB8ThqPm+8f8/rZmuKpbRU1Dobk1kmES97jPULJTbDDJOQ5+OPOQGzNKHNacsUMh9rJnSQ+EIkc2Jua0FSeDZm1eSiSCrhhcmY0J43XyMMNBgZa60UtJI51UEAIClEtVjkjROT100xz0V/f2aIliXwY94/0/DwMO85XHzGvkPjl2nPIRBk5BJIRoVCOCDmBJw4ZA0lqQLpoQ9H1dykCTZj4pnzoga3BxIpxQ07GBd7CSz0qi9/WQKoHapWD+byOXBoFWzYuSQ31fGL8l0KY0pVur9IaPYFj2EmaGaCVvoI07w333PPqwBgzfr1GbAjS+DHLtb0Dkoi0u/41HcuLLpY6O9+Ofa8N7VejZbYn0g3OSvG49tGSVlKQTvYbzwJKeUaNqxQEsNc0eCOxHC0j4X20yuswTO14wURcclVJUEiti1NaG+Y4gGcmCynEVqJhG3iLRG9X0KgVqvj3tnam5k519vbq7OrLEvgxyw2bBjycpbE7kNjr6uWSyxM4G/o2Id4gBMSEYjYGF1RAykgpOLF515EZAQ27USNNpYieR2K2ndoQ+EOBGFRUpXyuaueQcTEWoOJGoZYlvS7aAA+UtnUvwvP9drEX3OsjRUobjKQRIcZRwBCAxlDQil92NHnfOLQkbcNAoVoUJhFlsD4ExMXmLnwka/+5NwjkzMXs/Y1nzlCRoVJxfH6lzhhFhaZqhgCdvGZlxr3uQaHKeTn+rmkI1QUGedRoiRLKZ0F+UKuFaxF3HurJkPokLQf73vTZiwEEWlCxzcr/7xMIZ6b/DmAqRqSJgn7hmiCS0pheNfefgD2ncx2thfOEhh/es1nAIC68/59bytXPZuEVCEqODElDs266WEwHJzESZvqFs2xz82tybiJ/A6ZX6DDLdJGEBHa89YCHchwEEnI1CbYPxZTVHHZVKEmTvAZfE/j9J45EJoXFAnDN5wpONSQDuGVLLlS1XurzrO+Pj75wuL69ZzpZmUJjD89fHJIA2i5b+ehyxwVM/bDcyY3yKoGBAaKgf2NeCvE8ElzaouUPg3FcMqwRY/0m6NvxEiI4/mScv5v2hczESGXz7UxBxlGiFQpE7rQya4+RmJxDNzghOAexyJ91GTnS42qHghsWcAB/luQLgrb/tyDO67q7e3FUGZLmiXwn7p9JiJ86Es/uWaqVFsuSGtQmAVxZeJwJBx4IJHB0uEgPTi2/jWQTOZEmZFUkosdEPw5lU5MtkOwSFr4HQDg+SV41WnHkdYaU8XqHsuSVrCsbtpCh9BMQSLBpEJqJQWzigaPISQ1otNdRIKRmGj9SXozM3zYcV7xr9PjZ6G/P9OQzhIYf0Le72ayBOHGWx68rFhnSCE4HkQZ5AI2q2ZSMieumkjsTg30v7EGSu6U4/1uXI3D5CCOtd0fylM4jPGp6aMM0r5ipfKx0Ub4MrSUMjkzlkckkkJ8DSSKdJfPDUCR0FaVwj/5e2WCFGrK49zPdhx4pwQ405DOEvhPVn1HRkbUjRu3Lj1aLF+hlQOGr/nM4JQ6DjVOWhNGJI3Cb1ESNGPvU8OBOdmKmm1qWlfWJDIEUMof/+r2PZqDp9KNGxvZhIUfpS8/xIHeUMlkilUq05xoTgjgwYSCAAwIZumWynzfdPmqWyuV4wHwQAavzBL4j4316yGYOfeZb6y7ZqzotvmidZrCC5fToApD3ia5TjLphPGcy6ysJmCCAwfDeKIdP5kwBaQTA7CkAHy6QZ7T3mmnmUINlwXF7oXmCojN12eiLSmGfpqG5eFxgCM9XDKQZDGQheKxAYFITUlrztC2PdeDiId6e7Pr9CEiY3/gkREXiMgDBufuPjR2Ta1ahgRFwx6z2oZXIqdE65rRXTmBeqSkfahhEhZNsSmJ2GKzVWeOVlTJwyY3miMZkE80zrAiDHXkXkiBRA5RdMb2nQpT9ipmMhIlbmTEKavUBl0Rw89YCFGp1fm+o5OvYZ79HKhjIptmZRX4UcfgIIiZ5eCX/uvk8anialYOM2sZr3nMQ2LsXG/qQTfTR48GzxENzyDoJ+2Azf2MgTdOqjKbkA/zJpK++Gue44K13z43k9QxABxIbbZSx/WEskh0BiduRGNFj+GkxJChYU/R1JsFOY6ehlj2ru0TbwAD2TArS+BHXX2HhogB2Bu3HXjTdLlOkqROUPtM4EQqU8kYPDGlTBeYIjBDVOgi4SmOkjGxroEhEACK8owovQvm4PsRRGihEiCxrnzO2Sf6Wy0NkICUdvMltW9LnhDWY1ORUhg3K8QrM5OtEZ9xOQGpJBNJluJDBN0EFYslvunAoWsBLBnZtCkbZmUJjEclmxNct+L+nQdf6GlGKDLFbGJ6KVFVYi3o+CIWRAmRHSZOWnaSn8wcoLgS4ygy22ZDbM4wRKJUZYuQTqlPeW73nEUUaOWQEEiLUiqtOSyvxAlKQiTJwam9EIUCAJzsHIhj1FbKqCX2FTYEPEL8tWYt4Lq8U+kV1+3ZcSaGhjSyKpwlMB6dYRleM/DtF02VaieQ9hQzBKdYuIlpcBMDsxgjbax+QkhlwiYl9D9KcpXi6hVPwTjRmoY3BE6Smkg0GzRDax24F8Y5seOmr3vMbJ/Q1rrEdVxfMyO0LQ0nyqFOlzlAC828E8APo5tAmo4EJAgaZnkPbwbMoFyOi4rwwKHJ/8PMhKwKZwmMR8n73bbn4HXlmgsZCMSRiRNuED83FBopFoZjEISh4WySjRIaz9GOlKOqy02ehDnGXYPYn1YDSG56yNgi+WskW8i8/+mLgGooU99dB46lHLtLmFPl5AE/wnWb6plkJLk5HA+HdT6dP3mzYWJDgQQgsNTVCh+oeZd9as+BCzA4yNlZOEvgP+j8+/7hYXHLA/vPPzg+ewmzByYW5u7Sv+REYh9E5hInbS1q6DEzc5NtcDhA4gTBX5C5Uw4TxYR5cZQgFG2CKPEhrwrOwI7rlHylShGL3CW11ymAV3B4jg/PwfHNgSNPJkrZJ1Fwc4huZCK+sZgEC4omCTqaIXB04xNhpdcTroefjR+9XhBxdhbOEviRn397B+VqInfgKzesmXVFhwA8MBOlCAiMpFqGKRsbjpopSDhO4Zaiakvp82syYU0h9uTfI8FBZmOsy7FKe/JDJ+RiF0MV/Xtgbubuq9YO2vncQ9iM+ywo5sahV7Q2iuxgKD7nhooklGpTTFF6RhOHRS2U42Lb1ORVN8yMnyaGhjKucJbAf5BoXc+hI2PXVUszEESCmkAgmU0rEWr09TVsRdlsJcN9akJuxrcRRYKm12y4RknVywQazOThaqjokvdb6G37Du9gkL9i1ipdgCETa1kCU8MxP8lfNk0LyUCTwVTU5abWhdGQK6RRUlLwHkREWqkplnO+uvPQXyjmfDbMyhL4f43+EX949Zlv//LiyWJ1JWtHM1g0uKUktN84ARYMFTjC8pxIbQPBxZyiIJkyG0jtlo2vjwZhzMa0l+JkSGtJb/RvTDsPjM8ww1fl0Aqu5zW2pZw2UEuO5uPzecikCl4jI3n+pdT5GMnkjoZ44W5cx+9VLKnNwiuW+f6J6VdVgWdmullZAv/vo6v+TUwA//zmB66cLFZYCqnjs2msMkeJlCVjspxi4hhUQFOlgpKTrBghgWZuhallb3juDVUwmsj1+MngW7Vs3PgVF0D7ZRefe66nlEvQAspFPidt/1Vujy8K6Q+4QoE9E/nF0eSZTUskY7bFDYiyxHDKJHdwUpAvGoglIJkgEOsDTPOuvX/Lucxs9QU32CyBs2jaoTIPkmaet/tw8cWu0oFrJicICw0CV9QI/jc5tA3sHBNGGQEdOMGfhfGcsYlYErHVcI5O6Ec3pLTIS2H7NxwNx6nhmStOPLOQt7HjW5t0PJz298ehc2J8b2mi6JW6c6S20qAUGC2mXRrkjoBL3PAzkK90QpZFtWoV900cvR6AHOnvz87CWQI/xNl3YIAAzP34N25880SxvFQK6FDaMQL0GxBBCttEnao+oYIkmWe6RsJBkhifnlDHsEvTIpCQRH+RsW9NTqoptDsLn9St1muzxCAK4JS2Je0EzVen70ic4gkH/+WUGnQIrTSqNpihOT4yNCM6ccidFuHRg+OWPL4hClasxyh35ru2bn8xAO5jllkCZ5EeDoVX69H/Wn/PZZVancOaFypOkKnaapLVzTVONANO2F8jmmaZUu2crLaRUZiBgIqE8TgmOVATf6Sw7Yy7cAsyeMyqVW+1iKiy7s6t2yxL2Eppbdk53Ltt/9aq4+GUi1aKRJnkRjy0CdnkKInjo0WCXZXajplQSW7GVuZ4MUfRjju+aYh8josM3DJbvp6ZaWRwkLMEzgJp3i+GhvTWfaNvOjw2vkY7ZfjEhfCkK4wWlwwWX+NO1wdaJCuuKQBAzfpvQ9Uy0UoyG61o2okBCX5iXO19A7PQnXBj+2IGgLWrV5xBYMEkIewCRo9WZrRm4JRTw1dOgA6qrImJ5If2X0n/s+aEqWoSL00JA3HDgTTJwiLTOBUgIuG5Du+p1dd+9tChi3lw0Hq6D7OyBEZT3i+945P/MXe86AkphAr2kTHMEZSYPJt6VOYFB+PsmtDVoJQAe1M1upi9E1p0ctJgxZe0MtBLDbBLIUFCggGWgvDZl660AaCQszsFgSAshpWHLFiJVrQK7UEzoFXMkgqmVWwM7iih0RVbqiD0N06zqFJgjujnM9RLOKI06RguE7xhWmsSntJTLKyRA4ffAoAGnuYi8FkCp4gLGzZAA2jZc/hoX91TICGED1wwE4qNljKyrAfrOKUp/ouYaWQQ8sPhUPqYaZ53KWIzsbEaau5CRmG1ZCRkaYUQKJarFU/pFa973ZWXAsC87o6Turs6JTR7JC1Y5Kve7Zi8XTGzdVy+sNCtVpG4JbEheRv9lxMglbiaUup4QdEZmCKFa4oZSeENhym+OTAl1T+YwEqBXUeo6SkcLteu3ghnZW9v79NaPzpLYCNe+cphCQzpd3zmP581VfPO04AGSREhijg5pEqgsSi+iJMaN5w6L1MEQWSjBWdiI3nZmNIymstLxYqU4WCNKe2vBCjlob2lpQXArrt27LmFCLBta3m1WuFQsU6Gl8HQkAeg/cy2lrVesQjSkdRmAuecrqpmxxFjnNPVOdmVmDs1jtZJbFAMOXI3jMAkYEArIs9TR7Ro+/C9219xKZHX/zReKWWKHEnVDc3Mp/S97wvvmZ48CmkXOBZ/1H67ygKRWrEO2UWcIB6laPyNahpM8Rk4kpIMaXQUQyPZlKWJVS4IMTMoVvMwWUpBB6A8vxVlEkRUA1AXglAq1bbMliouARazTkvuaAIJf/wWosjIAGakgKBkEiRTE/MIO81NRPw4Pr6KeI3GCfNVxBDM8L0QAgALZ2qKt5L3lgnmv+8hmgk+P84q8NM8jwHM3vvg/ou157BgTwQSLyAhTR/AuP0TBp7XlG8kMn7FjvbmICopu0MJMTw2WtaobTXVmM0sEcZrEcInAgCA9gCvDla+P/CKvgFba8b9Ow7+1rJtYvYAz4HSrvkenJCXYg48xeHPTULELhKpFVpU8RPrLIpuVKY5OMxJfOifbCpqQhgtujDWYgHUUhBYCLAQRNpTo65e8O4t215HAPqfptdylsBB9PYOSgC45q+/+sLD07UeArRy68TaS/gIMgDWvueuDs7D4Z5TB79P/5kZ/u9DagHHXkLx4xiadfw1wWNV8P20sSmKnleb/yVoCDAEdCAKoLUb/PITZfPIkMvMbQvndfY4HjkkhGC3Bu3Wzco1XtF6FPk8aSHBlg22LLCU0MLHdGnfNxysOf7FbNpDNVihcupnNufwDFPFMoZYMjNYaf8XM1haYDsHtmzAskSlXMU945Nv1cxyhEhnLTSe1oZlmplF75//6+u1sNBSyIG1AoQGWQQhLYCl38ppFWpsRKAKzcYeVFBkfs2pvSwlAc3QRovJHJolhG2raIJ4YgMUYQgEkPSrbzjdVhKaLJa2hVxL3hyV2e0tVg8LoYXMwXHKuOjsk8+5K29/r/rSq2ReiNGX3P3ArzuWLL7Oq3kKIrhGlAZr346UlQjWWmE3IKIzdyTsbkyPOXUYjrHRbAKuGldj0IG1Kfs4GluCLBugPJCzBTt1NS7lWe8bHe0H8O99w8NypL9fZQn89AwNgFraWt9zytK5LYI79fzujtxM0VGatLJtG7AA1wPgug1f7CXeUF9jyg6kplzX9f/d9f/Jgu0/xAU8uMkPwgZs2HCjP/oPDL4UrvHc/uNcwA4fhfAJ4QEgpVmwkHM6CuN74+N4efu+0e1SCAsgFtKm2XJlVgfiWg4z5lqFgbPb6cuVQtVjRQTL/wFd1zNeF2DDQvCTRb8PX6dt+z+RC//rotdsW8HPYb5r/tdbNuC54c/hpS5TD4Dlv6eWDRdtyLkO52RBjs7WJwBgpK8vg1c+mbdAANPAwIAYYBa+GDiT+YuZaYBZ+GuH1N8PhF/z1IwBZjE8/EAOAL51w83PW/yC93h45ltV+3PfyWf3feQaAEDfsHyyrmTCz29goPHzbXpdsP+5p6+D4eFhycwiYztlcaxO29vu2bbvw/PWvrMsVr9Rt13yF3zRtR97jRAEDGQOCFkL/QQBMD7ylf/uWXnKUmfNuctOcZU3jz0q3Xr/9i25lprOWRbt2lfVz3/W6fPntLeffGCsumnX6FgRXk3CKqgzls7pnjen6xQPHhFj6r9v2bQjn7Oa3oEnAfSk/oyj/u975j786zQfi/D7NP2aHlRKs3RorKiuverMJaxl7lu33bv7OHTIWt3n7obPFb6eZ5+5fEHOtvKu69C3f/q7PcctOEm2tndy3VF8xrI5LcuPb11VyNndnsZprfn8JSUHZStXaK1Vy3jhRWetvfkb+sj3brjprpNve42anJzEUfQAPUD9yBgvO2lx6zOOm3viwUNH9y5d2L3oxltHd5VzM9TzUO/P0eDnOhr8zOa7Njf5/jX72YFJTB4Nf8YezO0Bdu1z9LNXdPcsXdR5mqto7MZb79mVzy2guqO4c4GyLz7lhJWCSMICDh2Z3LbzSHG2vSUnjgI4dGSM+1atOKnVFguqgid+c8umHYvmHm+dekJX95b9h8fbCjlRPnBYn7X6rMUd7fY52nOmv7fh3gfOe8Vzx9cSecd42/mkBy8L8dGP6td9+Bt/85s7Nv1fwQ4TU14zq7rimrRyvn6yUiyg7HxO5GuOV2UWSkhBgeuHZVsyTwCUUsrxdF0QQWtD5fEh3io2HPhEgJNGMFXm6O8J2sBBN2giR0pU4Xo5fKzmnG3lSBDV615dCBHtoUJxPBUMyWwpLZ/yCNQdpy6EJEkCJAmaidoKVueC7q784fHx2dmqKlc5t1gpF+yWsaCz3bEse9ZV8IQkwVpDe54PZvRXOCKXkznHcR3bsuy649UDTdokkow4wH/He29Ouy4mqJjGBtmwemHDgybUA2MwkxBWS84uuJ7y6o5bt6QIYKZMeVsWKNhN1V2vBhJKkCSGgudp5CyRty1pKa29uuPVQQSLYHmaPWnnwzGINa/N7pmtanf58UtuWPfld76KiOoP40GTJfCfoCkkgPDAA6NtfUNfuHXLntEzya0CUkLmW8DST2DSCuzWoZUDISRIWmCSARJBQXsemBlCCAjLTlxkDcB9NNp+NtDvOMXhTeGWoukxp741J0kAOtgBCR/THCe+CXrQSbdeIUQCDcYAlFMH6nVFtiVlPg+QDSF8SR3Pdfwpu2VHABXSnmEb6utgkRDQmiGlfEjXhyTDPy2kyUn1EubEpJ0TaG/DaiacZmsO3g+CFCIWkWeGVl70WQnLCm4uIrKQ0coDaxXt9AmAVh6EEP41IiyQVvCmxtRJpxwvP/m+N17Wf8mKX/X1DcuRkWN3sv0UAIIPAcz0pUUdzkc/9omNv79v+zWVWl1auUJ0cVDg80NgCGFF7JxQEUIQgUhCSB+0EF44Sc9tSuIzwvpp8lwpaVgWGSxEdIMkjCnE/obwpRAjHP4bB4qOgoRhDE4Jn6EIWGGALZB2aABDWhZkPi+EkOwDlnSAcxYQlsUitPkMiRuBMmSkVxVI0ErzvYt+cUKHixKyuGhgHUXvLVED55ggEppZiBROCEIIkBD+DcrwjCIAQkoIIf0bMImYSRWK6wmK/y18lUICJHwcjCBmEt6c7i7r5b3nvu2vXn3pCADxxS++Q2ct9OMQawYGrN8NDXmv+eBX/+bHv7vv4+W6o4SVk0hI4Oiky0B4+RHH8jaxO1ci38hAYSXVOLix+qTwviG0kRv8T0xGL0XUAQphmoFzQ8JyBc32pki6BSZITpRSuaCIZBFCEyOGkSkiQJyQgI1/ZhG0yhwgIA2R+aTyQAx/fCiv4NT7wWkdD0ruj9l4QcIAi9BDEB3TVjANIYT/SK3BgBL5NnnFBSu+85NPveG6AFaLYx2e+ZSZOvYODmoN0Lf+9s3rzzt92W9ZtkiQVEh5CQW4wwQh0EzeJPHP5KNyE6/q1Pk4oVcVKlMk3RlMuRxKqO+wIb3DEWE/bZwdiribzChq4OQ2T5mQPBGL5FECFGLe12I8NhkbFUrIASUb98ZzPQU3w0grizhZuk1CRKgxbT62QW+aYvsWTqliItYXS90WDQy2SGiUxWBtVlo58uQFrff85FNveNfGjRvzeBIk71MqgYeIdPBR3vqJd7/89Scv6R7VgCCwhtYx+D+FUUZauCVwUmCKVTBiv5CkXhMnZCmpQe+KEufQgLvLlJCLjTjBREnrb45rh2kuRkmPe+N3SHGU48uYUj5FYTroxG2MkoKYIMOymJJnauZE08tNCP6RqTkb+HGmhP25iSn38yj+GjKOGdHrC2mbxmsNh4QhuitO4vj3bGDPNSdt0kkI9rw6LZ3bVfnL115xLRFNrl69uoonCTFCPNW06IgGcfHKk/Y+5+xT3tjV3kLKU7FmRkLOJjl7inx92BikhNUDQeIZwpCRdlWi6FHSbsVISoou5pgPbA5sEqoeERwzOd4xW0LzZ0nbfUaG4jCsVwyxPA5dBCNMsiFlQ5RIqsb7VizY3iA365uyxLpZIV+YhSEenbxpRWdZMjoW44bIxKmuAMHMwqB4JjS0Dbmi6HlEfJs2aJzEGsrzVFtru7j6+c8aevcrLr6vr29YHstT56fgECu91lmPIUBs+fi7tj37smsWHBibuoCVw0REFJ55OG7ZTH5ug2h6Sg7VrNhk+gDBUG+k1FmZ0g05NR0+ECXbvvDcnCbxm8ZoscBdTOSnhrOkOSwySHoUG3YTocEtwlS9NDTmEud8Ttinmp1pk7O66amUnA4mZHcJ5mfDhu62IWjAKXvwyInC0Awz1DwpGPKZbC8QgbSnbNuyznnGCV8d+eT1g+NzniW//tmr3CcZ/PCpGX3Dw3K4ry93/Av/77oDY0efaeUK4ICcbzrUMxvj42hCGlh8BnI18XVPMXk/tNkMrjrRcOaMjYRCTiybAyVOUuWM8RXSuyU2p92mQRFTauBkqFWayRzxb5NnxTg5Tc6twScOb0Da+N5g49jAjaJ0RCmHt8bZVZPCHd0XOHEj4mi/bLbcOq0PxpS6oaScEBN3oGgyrZVW4pTj59394MjHLyGiMprPw7IWGk+MqSCIqPrlwTf948knLBVetcaRdCpraB1oLol4bQPD2yd20uPkGIjCsxonvIFNmlxypsRxhURIwUtOVM2EZebGimVK9yBuNc2NMRkT3XClFBHxjXM8UdK2RTTM34zkNQfXwf8I1CBwR+ZrDFdBTdwcUnLZierN5sQ8AMIY08B4uBdqRTfYyMVDs8RdksOBIKLPQQhiV2ssnNdT+tBb+t5OROXA9fBJJwjwlBUE27RpGADEW17bR/tHp/J3b9m3SmulIQQl1DBIRNQ/mBLmqWIY71cZSXuR2M+HEtOrlCMBxQMZ89yXmLBG/PxYeSNxxRsm2qayRSSKbr5uo0tAw/HAbKdjdQyixiUMM5rsbKONdMI2BU1tWJC0aOH0sI8SkrXxkSZV0UGJG1ri5zNvEA0Djrh7CL9OsdKd7W3y8mef+X+G3nT5jZs3r+SRoScnDZGe4sh9AhEzc/7CN376Z7dv2v0CKS0FaEmsA4lYSuwkydRZRkq/mAisOTqbcmLxSsl+0FCWJE6pVxoDs/D7UHLTmcxCTl6XRKkNZ0rInUJZVk6345RQvWxEmBnncE5WMkYzz+H0K38IjZP0jYGT+6FwtUXEzW3POZ7SsfGSG9wpTGH7QCyP0wkM9kha1sUrTvz+rd/4wKvqjpt8k5EpchxLLAdet26dRUT14U9e/+fLlywc94QtICzNJBNDEdIxWb5x/EqGNadfCXR69BtVFBEPUjhut40mzvBSiie7sVnZQ7iFp4jvHA3OAry1CAQAohsCo6m3SSrxohsBpyfw1ETfK2mNSkZrHTkpmGgwppTiJvvWpIgNzuNVlSFKn9DINo3QGqV6TNUPwFcHCVFY0Qou3pdrT7F16tJ5O9d9+f++o+644AGmJ2vyPi0kddauXesNDAyI4xd0jV550elv6yxY0DrYNAZaML4pitYAKyIoIqEECUUQinwmuQeQR4ASBBZEWpJQxKQIpAD/v0SkCdC+7xcl9aFSk1fi5Bk5HKpRygc4CXRAghBBhmNDpJhpntlNs7HEMaCxa0icsRMeUCn/poRIffrczI2+bOZbkDgvN2kCG3yRjLO/AfSgxA7fPJJzwq7FFIwXRKyUh/ldbdW3Xb3mDQDKzEw09OSW4nk6kZYJAF/+js9/ccO9u95eL88qECQzgSzL15qx7UAInaCVB2Id4YCJBDynDlWrAoIgcvkAP+0D5rVieOxjcrXSEARICgZmDI98YL2ILjHWxI14/yZtYQPbwYAoBvBLYydNCUIBJ+stUcPwyRzYJeGahtIkmr3SVHqnUaJpIXs2kNHceINI3yo080OvtwyWk/+6tYGZTk7hw6/S2vPaOtqtlz733L/6zsDrPxMUL/1UuKjxdJGNfefnf5H7/DuvuPDcaz7yuQd37z+7vaWlLnN2lVmMLujppJmau3NOZ0d18bwO2d3ZxpNTU0dcx622FgpEzLx43pz5c3valx0an56crjjFnLS6D44edQ6OT2lLyHlthfziI7NVsqW1pF6rFkqzs67HnGvpmIO6p6E9DWgXxMofR5OlhRDhAln4iamJjU1wsDiJVWM5MS4zkFoUJ5qxekmAJsABDZEMG9BkIidlXNNGawYyPChvWgcIswjgEp5lk403mxXfBKiwaTdKEXAjPhf77TVrRFhyouS5OFqphRj2sHpzxIJSmqS8+OyTfvHbL7/nRdTfL3h4WD8VZGitp5Np2fAwe0S0/oHdo+8/cGjiqp9tuO8fXnLxmdXLn3vmEQBkS3IOMfCgAOoeHwegBYAyrtwCfMZ5AcAEgN22oCIzYOUs1OpuDoD45o9uXnLng7var7702QObdx0qfecXN+8qu7wImleUirNLpovFLiFzc6uckx4LuPUKdL3iT8Sl1JIkB5S3INtEdNhjNAylk8JxiWNqvPaJscUUt88U9/ORdYqp15yCSIbnTAEyEtyAlDZpvdkwfeOkgnSilSZBAS2S4pbfmEUiTTgxMOwcGolzckgXVHqtPFeetKR737eH/vwvgifUTxUN6aej7k/QZXE+IGs/1ExAP0IalIUFmxkjI7qB6sB8OoBZIjokAdi2RNXxOvePTv2f7954+z2/u2tn95HxqdM95Z6l67XVE1Wnp+oKq64YnusEJ3MF6fP4Q7VZYWI6yJjkxnvah9poJlctJiakcRebHhobyplETQzOqDkvusEQKklEIoorMxvlOM1jCrsCSvgqGbgRM4GjmwvY85Se21HQ11xx4WVf+KtXrT/W+b1ZBW7ePgsi0mFp6RsZkWHyrrrzTntjseh/4uPjweXVB2waFBga8v88PCzW9PVRaeNGWoVVmCpsIgAYWbnSQyC5MsAsMDhIg4ODPDgIWrlyhIhoKwCsWTNgbdiwmZU7oololpk/+4FrrygZr28ZgLO/9JPbd9y7dfeJ2w9OnKtc58K9h8ZOKVVqy2amZ1o8kGCRAwBIvw1WwYCHGBChkWnYqgqjosZDXeMiJ2OHnT67MiW8m5LgUHoIf0JOUC7JWA9FtwYTSx5Wb469n8zzcXoaz5w6JkQ00fjvOALZINwU6Ja2NnnhuacOffGvXrV+zZoBa2Sk33uqVaOn7Jl3EKDNAI0QqTRMLkgaRUT7m41nWv0xJQFAnojdJutNG4DDvBjAOCW1k6Lneuudd9qLV61SgwCPAKLffy3AwIBYA4gN64E1ADZsGPKM12YDaAcw+4WRW5d3tODdt9y9bdHv7t3ePj1bOrvi6IUO5UTdccBahTQEJUgjGI6J0OUgTAgTJRZOck17FiPLo30smybhqdVaDGPhyJSbyPy35Fk5StTETYMbviNHlRgN1EROz8IpQLaZG+xIjEAqWLY8c9nCG+761gdeuXr19Wrjxq+4eAq2k08FT6PoM12zbp3csH69xtCQNh6zslPKTbNKWTfOzHRur9WW2Ip7p+v1Rb+aLB6cdd25c4FTD1cqetxxqcKsT2xtOX5uoaVLWhKHqpVD0443Oa9g06Jczipr3jfu1Pe+dOG8hae1tM53Let3SvBd5+fzkxd2dZVaiZwK8/EAakQ0nnjBw8Nyzfz51Nvbq4cMN4GBgQGBwUFs7h+hkZF+Nlv44GZzuGDL+uRMcem//OiWc3+zcfspU0cnLzk6NbNqpqZOrLoEp16B8jyAASmlBkkmgvALr2EATkaFbMgITqDFOECbctrmJFGXm9EJySQbPaTyUFRdm/CmGy9UMtHhqbsuG1h21q7n4uQTjhv91t+88cKLV520d2BgQAwZ10SWwMcQ0grDw/KtJ50kvrZ6tetbkPACAHO/WXLEz3fsPjUvqXdXpbx8yvOWz5TLS2vK66goDUjLsto7UPcUlPLgO5n5YAitlb8aBkC2DSFkBHKQxLAASKVQKhbdztYWi6RV7yBRbbXkgS7bGlucs4ud+fzGTmlvvuj4hQ++qr29BOAlBaJ/qceJWSBCHevWS6xd60UjpXgCzKkLTzCzCDoHDjScT3v3Z/6z6+DY5HNGp2aee2Bs8pyp2eIJpVKVkGuBpxiWv4/2fEwDCyImNszQkugz4yxtQiXNw3KTA3acYGxMqkUj0cFAU1HifE0NrTonMTkGTdAcYgXT6ZikALdeVfO6O+Tbr3nhKz721it/9FQ79z7pE5g58G/3ZU8KNlHNZW774cTEiu8cHj1//2zpubO1+uoiY/lsvtV2PAUmhud6gFMH6k5gBiY0E2lBZBCUAiNv3wWPgkknc2QhGszAfEICCSGkZgYsK7pAhfAvxVyhgJacjXyt6nYTiie0t01NK75xSWf7nas7Wne8e/Hi6rxc7s6q/x0t/1okFeozDwwOYigWzWBzcrpmzYC1AeuBDRsUAJYAPOY2APqT3/j1BQdGR/t+efvW+XVPXTJTqi6qswWnXgd7dRBIka8PFRF7TQRaNKgiergPoaFSmzOyeLfcBKhI3IiJjnyF0wohSVUSMoZUnABRhygwreA68r2vu2Ld377jFdfS4OBBHhzkp6pzIT3Z3AWGRkYI/f0qB6DOLG4rlz/wL7v2z71jsrRqul5ZXWltba2Uy+ByxU/GXE6TZXOgtkjQHgWV1b+6BCJCQ6IVM0a9bHjkxuAJUz41UTYZgmIktWYCaxF+b9HdgxYp0FYucYvmI92dXZvn2PT7t554/Jzz5nT/5vS89cMuKbmmNRyj7e7r68NIeH5OLlvR1zcsRzCCcBJuWxKO6y2wicamS6XF3/j5HZd/71d3njAzU3r+zOzs+bN1aqvWHSilfaE6ggoqGAEQbPL7Iv0a4TcnQZJFtqFETc7GnARvUKMU0UPxkDkcxhnT7pgBlTqLm9h1IQBhKZCQ5520cN3vv/H+lxJR6fGgCA4wi6EnyFyNnhzSzwNiaOVKQn+/YmY5A5z4F5u2vWhbqXzdzomJM0v5Qs6ROaBWBTyloJU/k+RAQFmIGPygdeDra3BKKWa6cKBSGT7G5AJHvFyK95sxiyd9UfoXsjBXmSSYmX0/M6Ul2RY4n0deCuTKRbRastRTKOw6oaN946mdHTe/6IQlN70wn5/uknJ0VmsQgOeuW2dtGB/ngb4+HjT17KIe03hB6JPAiArnBMzcuvHBQ+d/6t9uOG5ydvaFR6aqF45Nzp46U6lI5akodQQJRfF0O4YpG+9RNHVOrG9iwAiZihrcXIKXiE2f7ybnXoPnmxqkxcokCNRGBbtk48TFc8c+8/arL3jlpSv3Pi6JFdxMBZFBgcwSOG6VRyDQT0oC+O96/azPbd7+pi0zs6864vGCcrkCuC6ELRVLCwTt70hD/8vwfBQhlQjEOjp3JTWkRBOiuQGeoBiKQEa/aJ7cODGASSt/NKIwyL8baNbMYC1ZCkIuh1zORsG2MYd1rceS984tFG49f9HcDR867rgtSyz5YEnpZnvthMF1g+H1mgELG4ZCh1MwcwGAHPziL04uuqU33XrvrlP2jU2fUa3Xl9c8gVq9DlIOQKQFSQ0iEQjxUFIoMElkSO+N0/Q+DqppUijBqKZEjTPuSCqLYrmhUPxea/+Woh3u6uoSL3n+RS/+5l/33/BYOhUSgFcOD8vn9/WJvyRyPzk+/poT7dZtV89pu+PxrsbHZAITAB4elgg+gHXV6imf3rzzr7dMTb72kLDyTqkEMCvBICYSbJDtQ+NoTp+TTBtMMvSdmJNqGCm9VkZMMEgKuXAgycoPQcoLLmZhaD+nhN5NwTnfmJs4tgFmgFmKQh6yvQNdxJhTKo4VhPztyxcumH7DSSfMWd5SeEO7oFJJs01ELgYGRN/gIPWNjKCvrw8UtNxmMjMz9fePiJGRfh3PrnhRZ3vLkdlSteufvvs/l/5w3Z1nTxXLl05MTa8oudRTV4B2a9C+SqAWwgrLKnFUXkXCTpWMSp04GJvJnOBIJ8X9DIkDc6EFJhG356xBrKFV3SPAeu7q0z+//l/f965L1gxY5lruT3ldamai9f7QkZkXvXzrno/vLxXPHjjO6X3pV35Ww+AgP56CeHQsI0xc5q6XbHrw3feNTbzriKu7nXIZEMITBOlfOCKRpBQz3X1oXugowKaPbixyxoFWNLEhNyOogUQfDbaIDIkao9KQwbDhBPo3AaqPlRq5+ZqERNBWRh0BA4JZkGatBcAClo0W0jgubyNPtOWMuV23n9PV/YsPn7DklwFEcDb6puvWWejtVYgn1mmpVBoYGKBgyh1WchFoIssN9+1a8U/f/uVJM7OlK44cnbpobKZySs3hlmq9BhKWX/0ImkCa/BtptDiiyNQ7RbQwJtrRbZObAsVADWdmP4HN3bQk5vrUFL326kv52x9945uIBr/JPEjhzetPuu0Ioh3A303OXvJvW7Z+fr8onPvp4xf8y9uOX/SXrmaBx/ksTMdS1f0Is3jJoUOFVccdV33/nj0v/9no1Mf3uOqM6vQM4LmKpBTMTGFCCiFDKp0/LWImCMFEBEjJzMysNaDCBARBCCIpASbiqPqCQulZChE9keaUwXQJqmd4zDSQu00gjGTAjWPtLQqBB+EFTGiwY4lvCAbmOF66aNaKWWtCPi/zQbs9N5fbf2Jr/vZ2Qf/1wWecfOjZhcI8Ivp3AeBqv53UYaudPjcbFdr/CVLtdmdrATPl6twP/OsNXXWn8vIDR6YvveWBHQtqLp/uOF6bowie54HYA2utQVKLqDpHatBJ0QFDrJ5CrDM1oWIb8A3zfQcJCEuyUhoL2nNT3/joG19+2bNW3EvA7J+yAobvzZp166z1vb0awIIXbdn+3nsmi+88pNg+TdV+u3XtxS8loIgnYJB1zCTwW++80/7K6tUuM5/zhns2f/LHR468cJoESGlPaJasNbHymIUwWhRB/piKAM8F1wIfqvZ2oNAKkc/5n7bnAY4DXa8Byh+4QkqQbQVu9iowIQIHrazBHteU1LSgJPLHaPRiuw9OLDqTAuPUsFIJz4OmX5DpLhKbrJnC5QRBrBnEWkqBnE0yZ8NmjSWei2d3tKtJog+/4aST7uyb23XTHNuuTrvuHCKafrjpaRoY09c3LExgSXB2bsvb1tEv/OCms+/auv/Z923ff+7hialzZorTpzLL+WUX8DwFVnVoxYAQWgjBgmTYKVGA6qQEI+Mh6YqIFDbAOvgSAUVSdXV2yMsvOOOa7w+9bvgxGMIIo3tZ8N2DR744sGXbeQfzLctqsyU1f063fO2SeS/6x+XH/7yPWY78Kav+kyqBB1hgiPQn9u5d9d2D49/cMjm9UhVLWhTyDGmBSYBZCWh/xCGkgFXIIydt2MpjuM7RbrCzwLZlR0uhXNf6oKPF2H2l0k4hBDztoYXZOrur8wwBLFJM7bP1emHGdayylG2uEJ0OCbgguNVaQJMLElsQE0hDEIgQmEdTuCKKBy+EZCI2w/gblRfcXI7GNCyI/p21IdcaPwcZA7pgJ+53HLWaAGsU5s2lOcrTHR2ddy9rK9z6vJ7O29+2dOl/zfFRoLNEVMcAC/SuF+jt1WEFeQTtdpjsVkdrwatU6yjkbdzywN4XfvOnN7Xcfv/OM8q16qpyuXJu2cXSck3l6p4H5TlgsqAhAFYhSJ2DkzAL8rlNHEqDGbAxIgJrBWgP/pJAeVoU7BdddNZ3f/qZ69/U3z/iDQ/3/WlYRv78ReeJuKY1fXjvgat/NT7x1w+MH11VLldBgCO6e3LnFQr/dcfF57+0f2REPFYDs2M2gcOLZPXGjdYDq1e7r92y+9W/Ghv76j7FrVQu17lWyYGIKNeClpYCcsRo89REZy63bVmLfWhuIb/ZKuTvbLNyB5/R1rP/nYs7agD6ASwF8I0C0V7HyB0BIAegyrwawMsBzAD40g8OT3X/dmZy3oyrFo277kmWW7t4v6vmTs8WTylDLJmp1WxubYVr2WCnDnLqAJECCbDmwBQgSYJP81IT0k6UFIhPmBkZbJo0uD/xUBMwIUQ0JNMcG5EJZtZaKU1kob0deVuioBXaoQ+u6Z4zdkFX1+2L53R8tq+rywpJF8bFG+2buUm73ZjcfRIYYWa2Q5JIUKmXfvWnv89vuHPzMsdzL5ydLa7cM1HsLpfKJ1cd3aO1bnXqDpSwwBBwXOWrkwiCcl1AhGZqDO15kWMiM4EEcPZJi7fe8/2PPgdAkYjcP2bfO8AshtavF+t6e/E8Ik8zL//b/aPn/uTw6Nu3ViovKGoGlUpKMJOq1XlRV0ftPeedcdH7Fi2672m9B+4QhLV3PPChW8qVj03MFlm0tJIsFNA2PYFWzftO7Ox8YHlX1+9P6+64pW9O+13nz+k6WtW8CMBUEzpgwjcYvb0xlm89gKH1GnhoPGwwOHtGuyW3lTzV8m+HDy8v17wX3zpdXPRgrXb6RLF0/qzjLKwWWlB3XKBe87mlUoaLVpHYHXMaatzAsUmARjhaxZjytCl70tByhWIROE6sYJLVO/jeGiDWRAJSEqCRK9iYz6q+tK1tU5stb3jXictmXjqvZ7NN9AuXuR2Aa7y/NMBMQwHQOH0TpjSoZGwTmWfokBEGYEkhZ+2vOV7rP37vpkWjExMrXVedunHr7tbJ2cpxOVssrbncOT5TlvO7Wp7hKC3LVYc9z0OLLVs811VE7LS1tGpX5nde95Ln/OVHrnvexkcL1vDXlCMC/YmJ/MK/3Lbj8tsmpt6+u1p79qTHYKV9bwkiwVopO5eT/fPnfmnkvBVvrw8MCDyBGOsnLIFvGh/vuHjevIUvunfbW341Pvk+tzKDuZ1d6GBxX1dH+w2vXjh307uPX/hAJ9G9OSkw6ylJJquImfpGIFb0gYeCN394ZET09fU9LGE7uJAQ0gsHBgcJg4PYPAIawQiC6mPAg/kUAHvyRN7Ren3lDZPF53111545E9Xqcyeq9fOnW9t6qp4LXa+HgzIVzLsEUXKemtgZB4J0bKxXTCxENLxKnRFN2ZyUdmOMHxaxQG7CVNyfzjNI+JwlZgFpIWdb6HLqWJC3x+Z0tP/2mT1zNl8wr2fdn82ZcwuANgAzFFaY4WGJvj5gcJBThJGGZGZmGhwcpM2bV5oEDfO9FQAWW0QHFYCWnABDQCkNx1OdAMSvN+7ietUS55zeea5yMOOU5+w49VSIfM6adlxlSHE8YsIL+pjlyCAYQ6QFgHbLwgf37Ttj/ZHJV++YLb5y1FWnF+s1oFbTZNtMRFITQZDUyOXEqS32A1uf86znbwKmziRynlZQyrDdYOal79269wdfmyk9a151dvzSed1b59iFT3zqtGWjBaK7NIA9Bw+2LvnKV2oAgKEhbSCKAsDTn37fFn3YzDQAUNQaDQwIHhwUwc1BM/Pc2+r1nn/YtPuMsvb6d1TKFx+YKZ5Qk0JoCMCpg4g8kkIwWCCAXmroqF0mU4QtPao11S5JpAfUhhm4+X1EdDbmaOjDyUtcJHyCGJpZa09DeQI5W4j2NuS1QgujPi+f37W8Jb/5lLbOdReevPS3r8nlxgFMUvKi9RlgARnD/Iz8fCbdJJFS5+k+iTUrwqrNDz3Jevj1TuomzeHnCCIOV2qCiINxfH4vcNyntu1+wR2Tky/fX6r0zuYLhWrdgahUdYAPEOZ2QHue1zOniz901qlXvmfRol/jCa6+T0wFZhYMWG/auutDD8zWrjq3s+WrXz59+Q8BFIho5wPMuWs3buSNq1d7Kf4uPRGA9MTFYO5XDcoiM/cAqH9u5/6X3DI7+6Lbj06fPVuvnVVqayO3WgVcV5MQTMzCx46wwQJqdCQEGyanBtUuRinplNUnJRwITMuXpjZN5DOF2NBQDgo3B2JdxEQClgUpBQptrejSrtelvR2dOXvjQrvl1rctP9G9oqfLbiX6QkDGaAHgBWfR6Jn7hoflir4+xuAghgYH2TxThxW6Gc0vqujhjX8QBMTfI30mB4BBgDaPjFB6oMTM7URUYmZ5a7l8zj8eOLRi29T0FcW6euG4leupVCpQ9ToI8G+4mgWFa8XgJsr1utfe3WW97YQlI58+7eR3DgJjg+nr4imfwMHd8PaZmbm/qdQv/MCi+b8wF+59wyxH+h+bUfxjcQOIzlCbNnHQIXQBqAFo+dr45OVf2rXnwuly9WWjjGUVpaArZQCkBQlwwLVrsBmKiPccm4+Ff09pN3vTf5iaCNmkll4pxYpwpUWRJI3xdYI4+MQ4YCpJkhKUyyFPQKfnoJtoal539915KW97zpw5B09qa932+oVz72whmq4yzwNwGhHd/FCT3jXz5xMAbBgf5z70AX0ARoCRvsbqOwBgM0AYGcFIXx/WrF9PG9YDGFrrNflcngHgcEGI4g+np59xcLby2h+OTbQerrsXjc8WV5RaCl0lpaArFQBQPqSMBZvDhsiJUcBXISR5SXfrresvevZ1RLT9WDH/pmMA8CwD+6xH9Yb4yhuDtHJkM82fP0brAWD9hviOPggMxZayNDAAGgIw0LtG9AIY713AfVjBg4PA4OAQ+8XrD09282vWMVu9vvSNV63Xz3nDpt3LdlVLr9tfLr9wzHHbXAjAdZgEaRJCABzZLYWAkWRLnT7vUoTlDsEgSVhxgDcOfI4fwok14bNoal1ygEgj5gRwKmjIfWki7QlYFqGtDYVcDnatApvI6ZRyujVnbz+/o02d1d7hbK3Vvphn2nP18qVHn9/SMgrgRACd3ZZ157T64+7VASPtPABHAUx94ciRE+6drCzusfHKbbPFk++bLc4rEZ1UqjmdXlu7P3isVgNQkAUS5K8FIxlaEcv2RuIApHU+J5a1t+wcOvOZF1zbRUefyKnzsZHAzNQ3MiJG+vo0HlXSDojB9esF1m/QQ0PNxOes4FJXkQUUs1eQVKhpuIEl1EOoqwxAwP+eDXvPR7oaM5hBkv02S+cB3FirnfH9Hbuv+93kzGUHi6Vzy/kC3FoNUFqREAStRRLx1dyjpJmHIZGIAP5ESd12gmncppMffrSWSmEqUqsxk2ovRHDj8O9a2idYQWiQgJT+1zp1QHno6JoDS2sUCLOd4Cmyrf1LW1urE7XqthZBs52F1qm92tu5qqNDnNnRQZLI+cb+PdvzbLPtuoRcDvtqde5d3NN5Vmf3ib+ZnHTcUmlem6dO2lup5xZ1tK88Wnfm1zQvmgbmVxVy5VIJWrtAPu/DU30kjCJiwUoT0jg6g0UWMpzAALFizayXzpvnfvysM668rrtj3Tpma21SPinjAz/SpB0ZGaL+fijTm43Za9946CtLZ/WBk2dKE2dM1/Z3t9nzTqthKu/iKDu6xDY629utxcur9ckDGmqqPb+Qi+Wjm9vyC6tdHfO256lnX1v+xMMXLHrdYaJcjdmRgnKK/SSnYYbASB/6+h65lrBZkf2p5yCLoSGtmOcAKP/LviNXfefAwcsPlYovP5or9FSKRUApTVJyoNxK4WRaQ8eGZpyeSBsOf7oJscKkQjbBF5veyMyEBn+2VAIT0nasiaIe4lo5WIeRRkj1En5VF35XIHI5yJztg2GUizwD+cA5slyreYIIkgRYAB6DLRJ2vqWAitJwtd/aekr7Avyh1Y2nAKU1tC+s77uBC/IP3Do+niQk4kNSiXHHC26CGlrNn9MtXz6v541fXnnqvw8CzkeJNGeE/kcew9wnN2GEhyiC8ol7y/9+zp7Rm3orzqHnlivT53hcX0qyapPQUFrBdT0frSV990FWDKfuQFoBTJIYuVzOV91QEm6dwNouS5KHCy0tD5427+XLO6zjfm23Wp8+s+Oag66uGL7DkH19fejDHycMzsy5NiLnrmLx7A/tPPCCbdPTb9lVrpxWIQGtlM+2CvSsNGtD2ZGSqhZh5TWtRAwB9GganRaTMzj7sVti2gmRDcF0g+6b7tnTVi1kysJSOAjiAJYYEnk57hZY+J5GGiCCEFIgZI2FVVFrH2ctZDgA4wChRayZhKCwAyJTKcSUmUVscBXrVGs2DNqDn1trZuV6bR0d9vO6e97/i2ef82nvGHVyoGO54hINBc2MxAP1fz939/6bXzM+u+35dXfqHMqXyanX4ToqKBJCEyiUJCTf9ii+tgQRsb8C5UCelKEYWrFgzT6hRgLSJnhKI2+3oWB1zrbk5m5tKSy8qat9wU9fsPjv7iGSM+HnGCfziE5DnP8XOSCAiNcwWxuCdoyZWz+0fec1/zM+1b+9Uu8t5nKFerEIeK4nhPS1sBI8W4OHGzGdYtFkpiYEx0hJhA0UGCVhn0j9OxtfR6nW2hSlNqmSRI0XFifMnFKWp4aJGRlbcdbxyZ8EmabeEXjFcD8zb0DRjYuCY0N43yACCcMKWJty88IH2Dl1NX9Ot3X5vJ5//vdzTn+nGh6W3Nd3TIrB0zGp4TxIwBC0RAG/Hf2Hy3fP/Pe1s7OjVysq5pyaA1VngIQKqgaRAJEM7vuGmx00Em0iCcO9ILAzi+0CmUMoriBBEBpks7DyhHxLDtopQKB1b2tu7k0LOs7878uWfuyXRNZYeM4eHoYE+tDfP6L+0H3zmvXr5QafX9oNoPiv+4+c/oOJyet3HD366nGSfnvNrMmyGMzyofWp0vjrsOrqYKJtWnei0e6w0bo3aXAf3Bge7l4V+zClTMIRD+bY0IFupgGfhJ+GVFFhiO4lhfiImonKI3nGRcxcjm4w7LfsEd5aWsyW0AUp5fPndH3mp6vPeh+NjIhjNXmPxQQmACzRit+Mvf+SseKWoVJ9/9qqO4nKtAshhMdMgnx1xvi9FwCJwKFPIyH+HfJIE4Jr4dcaZzthDHx8OmJ49RADrLXWUkgmO0+QVisKYv5ER8v8X7S3L/7+FYv/4XdEVDTb/j+0xU5PvgnA7UePHv/Rnfuv2V0sv32vxkll5YFrNRZEgUJG5AtqeOIaihcJSGaT5ZNJwKDUjJu50ckBJgWSUxzfNGKMG+4RaUtiM5EbtKcNGGmyE+YGr8SY+JX0SY67dePmzck1UTyBZtbSQmdnF50q5Ps3PnfVp4EBAQzy/4b0eton8AAPCAwO4e8+2qoPO3c//8adf/PGmcruPyO7RpWio1lJJoaA0NExD76GedTK+d46PkgiutumrC05JAykzozhBR9pPJHwpd0CngwHAw4CfMYPMaTNsrWjAEIO8Nr2zms96ZeLelZ/u3fR+37n6VrUYg/3DTDRI5tkh1PsQYCG1q8XWLvWC8Tjl/35pu1rb5uaftPecuXiWWnBq1RAgBcIbQmCjrWYDYcGpBdQxnSbEtOntJZIM3iYKejXKPLMKS0NhGus4GxLptZY1J4TuCHJOWGrmpS0RVJBxbxRmx5nMNoGxKooifTngFGmXa2VFl3dPfryeXM/8INVKz/9HJ//q451NUs6Rs66GhD4zd6/+evDlbs/cfjoVsCVLKVQrEloZoCUFpIFBJOw/Pu29gAdNKzKYyiXmYSAlFA+/Y+IZODHBQTnYo6vD4o17dhgH/hDEwPhxEhWJhIgEkwEzVoRSAu7xYJEG9rb5/2+p/XUb1944jt+sIBWHg572WHuE39oVR4YGBDre3tF0F7nOmzb+T+bt635zcT02/bMlq6asK2CUyoDyvPXUAE4JBaLoyYOgPHgKlJ+DAdWhkQspfA3oQGa/1BOA7OT3Oi0MEGYXdQEKEmmZDQ3DNL859RgTroxNuhNpw8Hhj0pG5pbSbUVBjzXYyhrSUdX9f+eftrg+5ct/rRrMrKQyco+ZKxbt8Zau3aDN8rcvm77y/55fHrnddMTZUeKAguh83aBwVAAEVpa24KtQA5OXdUAXQULYg1o1iwhW6wcFepODbm8gLAVNGuwZngOw60zoIXWIeKQWAQa7snVSngH1+ZgKA0mM9hF/kO00swkWLR0ScoXWkBO28TcjlN+dMKiC792Qdu7fh+KxA4z5KbBAf5D98uGbzBbAD63e+KMHxzc8fqdJeeaccLySr0OKMUkhCaC0FF7jcQUujFx4kobQTFBkQyRmZyxgkbywJqcSXFaMjopDfsQKpScMjan6OXHKBJi+A7Lpvql2bqb4Evzs2ND3ohDs3CwVkpbti2PL+S3f/GZZ3/shZ2dv6KRkXG65hrFzMgS+OGqy7o11tDaDd726eFTbhv92req+uCFlRkPUkoItqDdnMrnCrs78ouPduaOn2BSGzwUN8/tPLUs3Y4DBw7cPdk+7yQJACVnl1oxf00PtzrH7ziwjom7T62rg13Czp3rONPHV9ziycqrLal4RZAkeK4GK0AK4QUiWH57Htpr6tjgyxRpS7SbFOJ2ELXaJAhCkGZSDNIy35IDuy3c0TL/puPnPOtblx7/sR8T0UTYXq/oG+Ah+sPA8KY2dh7ANPPyV23c9Pwdxdm3HHCcZxaZoOp1QGtFgnxWVMMRlZpMrZI7YB2sf9hUkEyIDyTlCCjaI3OSSpnWCuSUKLy5sUqsqQwUWMS8CjHfBuzTHLQJkUCUhTJJARMwmEALEEFp1rKlrQ1n5q0f/uSsZ71taSeN60zY/ZHvdvtpRN16+F97N4196/u5OZWF9ekcLGrfbsvWDa1i4a3HzT/ntgvmvnM3fMgUBSD5P3Si3WZTS3mMN3XtH193TrE2/ZpDxY3zZqsHz66r0im5Vg+e56JW19AKKtDJEqyTS//kRc/JOz4jPiNTKIrHgCZWmjVrJQttArl8GwrWwgMdLYu+dNbSN373jJbn7QEYAwyxEn3UTyPq0RDQsXat10KEitbyo9v3PW/D7Mxb7hudeF7JsubWHAdwHA3LZgEWTAaRIhT+ipBZlJwOM5rbkiL+mWO3wORYiZtdYJRUpGwconMsKsgmfJTiYZZBsQwtXHysstE2Rw6xjHjAF1Zff+MsWlrkXKLZFy1d+vf/edapHy95ChgYEPTRj+onS+V9whI4PPP+z8FPv+xA8X9+7FSLk3Nyy/59YdfpP37Okg/dSkTlh6rYK8cXMABs2rSCBweHEu/0IAZo5chmAoBN88cIAIZ6NygTcMPMkshSzF7b7Yc/efqR2U3PrenJlxbr089mu1iolKuolwFAKAILkrGPfcK5JxLVo9hNj2PIYuQGqEPoBWnNCsJWsq2zBTYvLPa0nfj1UxZd+dVzO177AOAZ0+tHvlOOenqflK6YWXZZlvqf2eqzP7zpgeftmJr5s6Mkz5ph+GwbZk3E0D7Yk1hQpJ8dUwyDiqcbrw7mwNz74V9QrJEdgTgav0+D7y+R2Rk37rBibDI4Et41/JCRVDwJ4WwcDD+0UhrMsrW9A6d3tv32VUuX/MXHli994NotW/KfP/VU58lqvUJPgJMg7pr57imHihs/Zzn6F5cv/8fvEtFkTFKB3DR/DaG3Vw9iiI3pKf9xVqODNERDum8YcsSAYwoUsGn8R6c9ePSHVxZr+149UxlfDbuCSsWB9oSypCQICP9K9LWyYpkbioYjmmOYYWhlkDAQ83tDJkCTpWWhzQapTqctP+/nJ3Rc9I21J/zNDaFF6aNZQ5mH88C8vMbM9tvu3/mCB2enr9taq62dUmpe3fMA1wMC6hwCgYMYBBI4JgQHhKQyZtJY2/QQjllUFCMtE64K4d8xBFPC18hU74x406HjA2KZIp+ckTpHQ8eTZRHLwQMCQhBrzZqVknYhj+MsMfr8BYv/4Wtnn/pVIpo6Fvi8T8oWet/0f/cc33V5KSSGDzOkjzX+A6vPo6QU+uuaQRpcv14MrfXNwUIQyR2HP7Nq19RtfzZdPtwPq7i05lahaoJBQoNYMEDMGjpoPcO9a7hXBhjBLDgB4aPw4vJbVwazVsqVhXYLAq3oKhx/z7zO075w5Ymf/R4RVcL3pQ+PfA3VRJgtFHZvX19G+w8P7Hzr78YmXnSwWF49my+IuuuA6nWGkCqgA4uHuiTi9YuO4VLGZDeU+os5zv702KQ5R/gONt2+A8EyY3Idf9/GXXRiUk0pCmZk2UIMaM0EmWvvwFIS5TO7Or75vmcs+9vntLUd6hseliOb+piGji1c85NuCv2oKs1jtYf2k9k02Z6zbv97rj5SfPD6snPkmQ5XUSl6vnE0tNCsyRRz12zsG31RZOjE2Q5Rmx39tY8I1poV2S0Q7e0dsMXcrUvazv/Oxcve97UOWjwaraGG+0R//4j+g5QqQtZXzFfuBjD7z/uPrrrh8MG+7TNTl00xzi7ZOXiVMthVDCG08G3+iNmYXpmDJWPHTM3OyGlwlZmHCcaU8XXNfIGZUwCU1ACMKNmHM2v2XELdEVZnJ5a25CqnzZv7zY+cdsbnn1ugrSot2ofMnfBRVsKk8R+ONdYThqifEFYvcdOBv71899RNbyg541eRrNiVkgethWJmQf5oKLG1iFFQDK0NM4gQ3JCUOw6QYEIzmK0cy0JLCyx0j3XkFv/gpMWXfv3COe++Q6H6R9300kgvAUAxH/e2Bx5cft/U1MsO19wrZ8ArqyRR1xrseSDX1YFQPmmAKKQrcaPrRDPwBZu8ZTboVRH3OYC4UvDYAPsctuDRDdA8I5uVNtAIZxLMgqQQAjm3hpUtLc55c+d/9zWnn/bp5xuJeyxDIp+eBt+P8Xl9BP0ing5LbC599fzth3/zntHZnVe5NNNWKXoACyUkBCMwzTZAIhEIRAfrJ0Zi8BIPjcKUAkiT1qyZpJKFVhvstqv5nadumNt++udecMLgDaGCSd8wZJ+PvdaPVJHRT2JggEFDAH1540Zx/erVbhuAEnPLB3fuPX/T7OxLtsyULjnquCvrzF0124ZyHFDdAQMqqHxEARcoEp41fh4dEQ1M6YFGZRFq4lhoGDWDwzu8VuG+1y/dUmj23TYk2trQmsujg1Bb2lK46ZxC7kdfPPO0dXngQSLSWLfOGujt1ccKAT9L4Cei1R/ukyMYgT/8Etg0M3zqriP/9YEDk/dfjUKls1JRgBYea0iQDhh/8SCLo91net8aQsGMs2REsCAOpJ1loUsin+tAa2He3R25E//fmkXv+8m8ttMPhKwon3K54g/eKaf3yiHNsUDkjIxPP/M340cvuX1q6rzxSuXCGcc5sVposarM4GoNwaotbLkN9oS/OU4YHzElpsrhIwVg3NSSk+eAhA9IqTVrn+vreRIMoL0dba0FdLj1Sk9b292ndffc2Ldg/i/fsmDO7SWl7XDleCwpZ2QJfIy014MYgs9NFrhtz5eW76v/4h3T5UNv0FapuzzjghV5TCRJMPlTa53Ud07tQpmSqF6/ase4QyLBENACTFYLhBQ52Jg7Nadz8fC8zlO+9bwFH78tUn4cgBge7KNHNVcIn3RwEBga4kCkzrWIXI958b+Njq78ycGxEybK5YtLnj77qOOcWsnnu+ogVEtlCEEId3bwVDA49o1rKGHwBqOtTsK+WBAJIqlD+1QChGWBBCGXyyNfq6qFwNT81vY75s3t+Ok7Tz91y1rb3mgTlVwOjB38xKXBY0BwLktgHLuG45tXDlG4jrp76uvLdo797J2T5QPXulzqqZQ8EEmPwJIDb6V4n8wJ1VgyijORMU0N7MGEpJgoy4ja67auAuAV0GYvvGtO7uSfnDzv0pGz5v3ZFgSQzT+V8ACGh+VwXx+uIVIMoBVAmfnU35bLpZ8fmTjjYKWyou54a/e4TveRcmWe8rwTlGV3FuuOdut1Wejogkf+QEGHrTGHpHqAtE8+kQxIrVGrlFVbS0HkpKi3Ek10t7buWl7IHe7I53+9oLv7zr9fsqAOwCai+5iZBtevl0OGLcyjFXnPEvhpmsgrV8YyP3dP/euyzQd/9a5S9cC12i53V4outBaKAAHSKS9Ng8Ruig+YM1eiYPgVPi48BkpmaA3NQuZAVi4Hqdudzo7Fv5nTdsq3Xnz8Z24kklORgERQmf+QNruJvhf1AWJkJBK/Dx8nAZzfRnRHmdn6XfFw9966vWz/dPn0Bba49PuHxm/bWalYKzs6zjpQqVjTrseCBLQgtEqBeTlbtEhZ3T5Tvf+KhXPnntfZumhK0C/nF+zN1y5YMNpKVKowH99CtL9mvL4169ZZoRb10zmyBP5TJfJgPLneMvX1ZQ8c+vm7Zt0j17o02V2eqYHZUoKIWLBgc48EgBVHFVkAgAinrgarl5GUvaFIsEAzaw2prdZOG5ZshcWdB9utBb/u6jj+J5cc/76bO+iEMUPEjwbWrZErexfwo67OgWdSv7GiSlc+Zp4LYCkR3fuISODwNbFqzOcDuIfSFXVgQAwMDmIwIlMRZ1delsCPYSITpviWZTft+Po7j5a3va7GE/MqNQeeAyUgCGABoaMBF7MBF5Qx3po1RTYsaRtO36XTH/UKEdAbmUlYWtg5CVY2pOg42tW6+JZ5LSf9aOXil9x0YuGF2zVqCQmNgfWQK3v7uA8rGBjkR7GiEqFVTaDhHDlarFm3ztoAAOO9D/89568nrO1VIXl+gFmEXkxPlKh/lsBZIiufbrdj4U92fvT1U8X9f+GJoydWaxXUy2CQ0CTg60KbE2oRL5VZU+CV4O+S/eFsvIYhYdDowktcgzWzZq2JpBaFNguFfBuEmlMp5Nrvasn13HzcnBU3L5t3+W3H0QXjzSR2BwYgYGhnA8AmrGAAGAx++b9vnvDNrFX+gJsBP53OsVkCP0laa2buWr//Pa84NL35+una2AUKVVTLDgQsRZIAhgyRlogIEfG0iyJ19WBwKxDLp4aoJR0TL3wdMPI30cQg0tK2BSzbgkALlGOPt7XMuS8ve+7paT/u/jn5ZdvOWHj1jh550rinXQAq+xCzBM4iDQphZlq3+6OXjZXvef1M7fCVsMtzXOWhXtUAhAIzMTOxr+eTEIOLWHIRiomiPTIzDG2sUCssltdhRQzta7QytLALQuRaBaRlgT0Jr27DktaYtPIHOtq699Zranu7NX/KalEPLm1fzVtGb9929sIXL26zFneu3/6FzbI9131S50UH1yz9i/0GWCqLLIGfLugugQrff+Jv9/7TS8Zmd7/C5eoa5CqiUq6iVtJgQAlB8H1pOeLympPqmJNraDdzLPYXosJY+wWVWUSqkSSIhYRmzey5mrRSQuaICq0SdkHCsi2wkvDqgIU8iqWyQzbnWttbYfOcSkfbyT9e0vrMT1y06M2bAuZSlsBZAuNpiO4CCHlsmvrX83ce/d2Lpsr7XlquT59Pubqoe3W4VYZySROTJikIFHkP+3iucH+sjT0yxaydiHzAMX+fRNiqU9R6swYEkRbST2wIVp6rpFNTtuvV0TNvLnLcsa+7bfnPTl+w9htnz3/LndlRNUvgp/05Gb0NtEa6a+Kz5x+Y3Hz5bP3QpdX69PkeKnNAHjyloEJNayU0wJqZSFDE1otEf8BIKdnFszHDRUX75CUdunZKaROsPCFfsKFdG6h1TS/pfOaEbFUffOEJn/0lEc34k2KIwVBPO4ssgbMW2zdtM2mNhBzG+fYl9+3+7uqx0q5nVfXseXW3dj5Jd76wldDswXNdaKVjHS8wXEdBqxhbLaT/iwTDsiwwa3haQZI/Ccu32BDCBnsWSOen8nbHlrbC3JvntZ74y94lH9wMtHYS0dY/mqecRZbAT7NkVsmVig1mp+uWg589qVjfd5KrKufNVMaXsagfV3cqCzTrRYodK2fnuupuDZ7n+h+yFMhZNmyRQ61enmJYKkdtrrCxIy/nFsmytrW3zLunw16w9ZlLX7tnDq0YVagfk/ztLLIEflIOvzatH6Oh9Rs0GixVCQI2FNdzU1MbW0bVgTbO6RNHZ+/lqdr+4DNuQYfVg+N6ztZHR7ftap13qrOqu09Lyhc1CEglq6lD1tc3rB/NTjeLLLJ4iIRmHhDD3CcH1q2x+oYh/4ibMWEAYmDdGmuY+yTzgGDm7MaeVeAsniilE7/jHnyYz3YoUnnO2uEsssgiiyyyyCKLLLLIIossssgiiyyyyCKLLLLIIossssgiiyyyyCKLLLLIIossnt7x/wFvPPGQVrk0FAAAAABJRU5ErkJggg==";
+function logoMark(size){
+  size = size||30;
+  return `<img src="${LOGO_DATA_URI}" width="${size}" height="${size}" alt="" style="display:block;object-fit:contain;" />`;
+}
+
+/* ---------------- seed data ---------------- */
+const SUPERMARKETS = [
+  {id:"plazavea", name:"Plaza Vea", color:"#C9483A"},
+  {id:"wong", name:"Wong", color:"#2F8F52"},
+  {id:"metro", name:"Metro", color:"#D98A2B"},
+  {id:"tottus", name:"Tottus", color:"#A6488B"},
+  {id:"vivanda", name:"Vivanda", color:"#3B7DC4"}
+];
+const SM = Object.fromEntries(SUPERMARKETS.map(s=>[s.id,s]));
+
+const STORES = [
+  {id:"pv1",chain:"plazavea",name:"Plaza Vea La Molina",place:"Molina Plaza",district:"La Molina",lat:-12.0850,lng:-76.9420},
+  {id:"pv2",chain:"plazavea",name:"Plaza Vea San Miguel",place:"Av. La Marina",district:"San Miguel",lat:-12.0772,lng:-77.0850},
+  {id:"pv3",chain:"plazavea",name:"Plaza Vea Los Olivos",place:"Av. Carlos Izaguirre",district:"Los Olivos",lat:-11.9822,lng:-77.0703},
+  {id:"pv4",chain:"plazavea",name:"Plaza Vea Surco",place:"Higuereta",district:"Surco",lat:-12.1391,lng:-76.9946},
+  {id:"w1",chain:"wong",name:"Wong San Isidro",place:"Camino Real",district:"San Isidro",lat:-12.0985,lng:-77.0342},
+  {id:"w2",chain:"wong",name:"Wong Miraflores",place:"Óvalo Gutiérrez",district:"Miraflores",lat:-12.1180,lng:-77.0330},
+  {id:"w3",chain:"wong",name:"Wong La Molina",place:"Av. Raúl Ferrero",district:"La Molina",lat:-12.0790,lng:-76.9460},
+  {id:"w4",chain:"wong",name:"Wong Surco",place:"Chacarilla",district:"Surco",lat:-12.1080,lng:-76.9800},
+  {id:"m1",chain:"metro",name:"Metro San Borja",place:"Av. Aviación",district:"San Borja",lat:-12.1086,lng:-77.0007},
+  {id:"m2",chain:"metro",name:"Metro Comas",place:"Av. Túpac Amaru",district:"Comas",lat:-11.9350,lng:-77.0520},
+  {id:"m3",chain:"metro",name:"Metro Ate",place:"Av. Nicolás Ayllón",district:"Ate",lat:-12.0260,lng:-76.9180},
+  {id:"m4",chain:"metro",name:"Metro Chorrillos",place:"Av. Defensores del Morro",district:"Chorrillos",lat:-12.1710,lng:-77.0180},
+  {id:"t1",chain:"tottus",name:"Tottus San Miguel",place:"Plaza San Miguel",district:"San Miguel",lat:-12.0790,lng:-77.0870},
+  {id:"t2",chain:"tottus",name:"Tottus Los Olivos",place:"Plaza Norte",district:"Los Olivos",lat:-11.9800,lng:-77.0650},
+  {id:"t3",chain:"tottus",name:"Tottus Surco",place:"Av. Angamos Este",district:"Surco",lat:-12.1170,lng:-77.0000},
+  {id:"t4",chain:"tottus",name:"Tottus Jesús María",place:"Av. Salaverry",district:"Jesús María",lat:-12.0742,lng:-77.0487},
+  {id:"v1",chain:"vivanda",name:"Vivanda Miraflores",place:"Av. Pardo",district:"Miraflores",lat:-12.1219,lng:-77.0297},
+  {id:"v2",chain:"vivanda",name:"Vivanda San Isidro",place:"Camino Real",district:"San Isidro",lat:-12.0960,lng:-77.0360},
+  {id:"v3",chain:"vivanda",name:"Vivanda La Molina",place:"Molina Plaza",district:"La Molina",lat:-12.0845,lng:-76.9430},
+  {id:"v4",chain:"vivanda",name:"Vivanda Surquillo",place:"Av. Angamos",district:"Surquillo",lat:-12.1157,lng:-77.0138}
+];
+
+const DISTRICTS = [
+  {id:"la-molina",name:"La Molina",lat:-12.0850,lng:-76.9420},
+  {id:"san-isidro",name:"San Isidro",lat:-12.0985,lng:-77.0342},
+  {id:"miraflores",name:"Miraflores",lat:-12.1211,lng:-77.0293},
+  {id:"surco",name:"Santiago de Surco",lat:-12.1391,lng:-76.9946},
+  {id:"san-borja",name:"San Borja",lat:-12.1086,lng:-77.0007},
+  {id:"jesus-maria",name:"Jesús María",lat:-12.0742,lng:-77.0487},
+  {id:"san-miguel",name:"San Miguel",lat:-12.0772,lng:-77.0850},
+  {id:"los-olivos",name:"Los Olivos",lat:-11.9822,lng:-77.0703},
+  {id:"surquillo",name:"Surquillo",lat:-12.1157,lng:-77.0138},
+  {id:"chorrillos",name:"Chorrillos",lat:-12.1710,lng:-77.0180},
+  {id:"comas",name:"Comas",lat:-11.9350,lng:-77.0520},
+  {id:"ate",name:"Ate",lat:-12.0260,lng:-76.9180},
+  {id:"barranco",name:"Barranco",lat:-12.1494,lng:-77.0203},
+  {id:"pueblo-libre",name:"Pueblo Libre",lat:-12.0746,lng:-77.0630},
+  {id:"callao",name:"Callao",lat:-12.0560,lng:-77.1180}
+];
+
+const CATEGORIES = ["Lácteos","Bebidas","Cervezas","Licores","Frutas y Verduras","Carnes y Pescados","Panadería","Abarrotes","Cuidado del hogar","Saludable","Market Asiático","Farmacia","Premium y Gourmet"];
+
+const PRODUCTS = [
+  {id:"leche-gloria-entera-1l",name:"Leche Gloria Entera",brand:"Gloria",category:"Lácteos",presentation:"1 L",qty:1,unit:"L",synonyms:["leche entera","leche gloria azul"],
+    basePrices:{plazavea:5.90,wong:6.20,metro:6.10,tottus:6.00,vivanda:6.40}},
+  {id:"leche-gloria-light-1l",name:"Leche Gloria Light",brand:"Gloria",category:"Lácteos",presentation:"1 L",qty:1,unit:"L",synonyms:["leche descremada"],
+    basePrices:{plazavea:6.10,wong:6.40,metro:6.30,tottus:6.20,vivanda:6.60}},
+  {id:"leche-gloria-deslactosada-1l",name:"Leche Gloria Sin Lactosa",brand:"Gloria",category:"Lácteos",presentation:"1 L",qty:1,unit:"L",synonyms:["leche deslactosada","sin lactosa"],
+    basePrices:{plazavea:6.80,wong:7.10,metro:7.00,tottus:6.90,vivanda:7.30}},
+  {id:"leche-gloria-evaporada-400g",name:"Leche Gloria Evaporada",brand:"Gloria",category:"Lácteos",presentation:"Tarro 400 g",qty:0.4,unit:"kg",synonyms:["leche en tarro","evaporada"],
+    basePrices:{plazavea:2.30,wong:2.50,metro:2.40,tottus:2.35,vivanda:2.60}},
+  {id:"pack-leche-gloria-1l-x6",name:"Pack Leche Gloria Entera",brand:"Gloria",category:"Lácteos",presentation:"Pack 6 x 1 L",qty:6,unit:"L",synonyms:["pack de leche","six pack leche"],
+    basePrices:{plazavea:33.90,wong:35.50,metro:34.90,tottus:34.50,vivanda:36.20}},
+  {id:"leche-laive-entera-1l",name:"Leche Laive Entera",brand:"Laive",category:"Lácteos",presentation:"1 L",qty:1,unit:"L",synonyms:[],
+    basePrices:{plazavea:5.80,wong:6.10,metro:6.00,tottus:5.90,vivanda:6.30}},
+  {id:"yogurt-gloria-fresa-1l",name:"Yogurt Gloria Fresa",brand:"Gloria",category:"Lácteos",presentation:"1 L",qty:1,unit:"unidad",synonyms:["yogurt de fresa"],
+    basePrices:{plazavea:7.20,wong:7.60,metro:7.40,tottus:7.30,vivanda:7.80}},
+  {id:"yogurt-griego-gloria-150g",name:"Yogurt Griego Gloria",brand:"Gloria",category:"Lácteos",presentation:"150 g",qty:1,unit:"unidad",synonyms:["yogurt griego"],
+    basePrices:{plazavea:3.80,wong:4.10,metro:3.90,tottus:3.85,vivanda:4.20}},
+  {id:"pack-yogurt-griego-gloria-4x150g",name:"Pack Yogurt Griego Gloria",brand:"Gloria",category:"Lácteos",presentation:"Pack 4 x 150 g",qty:4,unit:"unidad",synonyms:["pack yogurt griego"],
+    basePrices:{plazavea:14.90,wong:15.90,metro:15.40,tottus:15.20,vivanda:16.50}},
+  {id:"coca-cola-zero-1.5l",name:"Coca-Cola Zero",brand:"Coca-Cola",category:"Bebidas",presentation:"1.5 L",qty:1.5,unit:"L",synonyms:["coca zero","cocacola zero","gaseosa zero","coca cola sin azucar"],
+    basePrices:{plazavea:6.50,wong:6.90,metro:6.70,tottus:6.60,vivanda:7.10}},
+  {id:"coca-cola-zero-500ml",name:"Coca-Cola Zero",brand:"Coca-Cola",category:"Bebidas",presentation:"500 ml",qty:500,unit:"ml",synonyms:["coca zero personal"],
+    basePrices:{plazavea:2.90,wong:3.10,metro:3.00,tottus:2.95,vivanda:3.20}},
+  {id:"coca-cola-original-1.5l",name:"Coca-Cola Original",brand:"Coca-Cola",category:"Bebidas",presentation:"1.5 L",qty:1.5,unit:"L",synonyms:["coca cola normal","gaseosa coca cola"],
+    basePrices:{plazavea:6.90,wong:7.30,metro:7.10,tottus:7.00,vivanda:7.50}},
+  {id:"inca-kola-1.5l",name:"Inca Kola",brand:"Inca Kola",category:"Bebidas",presentation:"1.5 L",qty:1.5,unit:"L",synonyms:["gaseosa amarilla","kola"],
+    basePrices:{plazavea:6.80,wong:7.20,metro:7.00,tottus:6.90,vivanda:7.40}},
+  {id:"agua-san-luis-sin-gas-625ml",name:"Agua San Luis Sin Gas",brand:"San Luis",category:"Bebidas",presentation:"625 ml",qty:625,unit:"ml",synonyms:["agua mineral","agua sin gas"],
+    basePrices:{plazavea:1.50,wong:1.70,metro:1.60,tottus:1.55,vivanda:1.80}},
+  {id:"papel-elite-doble-hoja-x4",name:"Papel Higiénico Elite Doble Hoja",brand:"Elite",category:"Cuidado del hogar",presentation:"Pack x4",qty:4,unit:"unidad",synonyms:["papel elite","papel higienico elite","papel del bano elite"],
+    basePrices:{plazavea:9.90,wong:10.50,metro:10.20,tottus:10.00,vivanda:10.90}},
+  {id:"papel-elite-suave-x8",name:"Papel Higiénico Elite Suave",brand:"Elite",category:"Cuidado del hogar",presentation:"Pack x8",qty:8,unit:"unidad",synonyms:["papel elite pack grande"],
+    basePrices:{plazavea:17.90,wong:18.90,metro:18.30,tottus:18.00,vivanda:19.50}},
+  {id:"papel-noble-x4",name:"Papel Higiénico Noble",brand:"Noble",category:"Cuidado del hogar",presentation:"Pack x4",qty:4,unit:"unidad",synonyms:["papel noble","papel higienico noble"],
+    basePrices:{plazavea:8.50,wong:9.10,metro:8.80,tottus:8.60,vivanda:9.40}},
+  {id:"pollo-entero-san-fernando-kg",name:"Pollo Entero San Fernando",brand:"San Fernando",category:"Carnes y Pescados",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["pollo","pollo fresco","pollo entero"],
+    basePrices:{plazavea:13.90,wong:14.50,metro:14.20,tottus:13.80,vivanda:14.90}},
+  {id:"pechuga-pollo-san-fernando-kg",name:"Pechuga de Pollo San Fernando",brand:"San Fernando",category:"Carnes y Pescados",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["pollo","pechuga","pechuga de pollo"],
+    basePrices:{plazavea:17.90,wong:18.60,metro:18.20,tottus:17.70,vivanda:19.10}},
+  {id:"trozos-pollo-redondos-san-fernando-kg",name:"Trozos de Pollo Redondos",brand:"San Fernando",category:"Carnes y Pescados",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["pollo","trozos de pollo","presas de pollo"],
+    basePrices:{plazavea:15.50,wong:16.20,metro:15.90,tottus:15.40,vivanda:16.60}},
+  {id:"arroz-costeno-extra-750g",name:"Arroz Costeño Extra",brand:"Costeño",category:"Abarrotes",presentation:"750 g",qty:0.75,unit:"kg",synonyms:["arroz"],
+    basePrices:{plazavea:3.90,wong:4.20,metro:4.00,tottus:3.95,vivanda:4.30}},
+  {id:"arroz-paisana-750g",name:"Arroz Paisana",brand:"Paisana",category:"Abarrotes",presentation:"750 g",qty:0.75,unit:"kg",synonyms:["arroz"],
+    basePrices:{plazavea:3.60,wong:3.90,metro:3.75,tottus:3.65,vivanda:4.00}},
+  {id:"huevos-rojos-san-fernando-x30",name:"Huevos Rojos San Fernando",brand:"San Fernando",category:"Abarrotes",presentation:"Panal x30",qty:30,unit:"unidad",synonyms:["huevos","huevos rojos","panal de huevos"],
+    basePrices:{plazavea:16.90,wong:17.90,metro:17.40,tottus:17.00,vivanda:18.20}},
+  {id:"huevos-blancos-x30",name:"Huevos Blancos",brand:"Genérico",category:"Abarrotes",presentation:"Panal x30",qty:30,unit:"unidad",synonyms:["huevos","huevos blancos"],
+    basePrices:{plazavea:14.90,wong:15.70,metro:15.30,tottus:15.00,vivanda:16.10}},
+  {id:"aceite-primor-1l",name:"Aceite Primor",brand:"Primor",category:"Abarrotes",presentation:"1 L",qty:1,unit:"L",synonyms:["aceite vegetal","aceite de cocina"],
+    basePrices:{plazavea:9.90,wong:10.40,metro:10.10,tottus:9.95,vivanda:10.60}},
+  {id:"aceite-cocinero-1l",name:"Aceite Cocinero",brand:"Cocinero",category:"Abarrotes",presentation:"1 L",qty:1,unit:"L",synonyms:["aceite vegetal","aceite de cocina"],
+    basePrices:{plazavea:9.50,wong:9.90,metro:9.70,tottus:9.60,vivanda:10.10}},
+  {id:"azucar-rubia-cartavio-1kg",name:"Azúcar Rubia Cartavio",brand:"Cartavio",category:"Abarrotes",presentation:"1 Kg",qty:1,unit:"kg",synonyms:["azucar"],
+    basePrices:{plazavea:4.50,wong:4.80,metro:4.65,tottus:4.55,vivanda:4.90}},
+  {id:"fideos-don-vittorio-spaghetti-500g",name:"Fideos Don Vittorio Spaghetti",brand:"Don Vittorio",category:"Abarrotes",presentation:"500 g",qty:0.5,unit:"kg",synonyms:["fideos","spaghetti","fideos spaghetti"],
+    basePrices:{plazavea:3.20,wong:3.50,metro:3.35,tottus:3.25,vivanda:3.60}},
+  {id:"pan-molde-bimbo-integral-650g",name:"Pan de Molde Bimbo Integral",brand:"Bimbo",category:"Panadería",presentation:"650 g",qty:0.65,unit:"kg",synonyms:["pan de molde","pan integral","pan bimbo"],
+    basePrices:{plazavea:7.90,wong:8.40,metro:8.10,tottus:8.00,vivanda:8.60}},
+
+  {id:"cerveza-pilsen-callao-620ml",name:"Cerveza Pilsen Callao",brand:"Pilsen Callao",category:"Cervezas",presentation:"Botella 620 ml",qty:0.62,unit:"L",synonyms:["cerveza","pilsen"],
+    basePrices:{plazavea:8.50,wong:9.20,metro:8.90,tottus:8.70,vivanda:9.50}},
+  {id:"pack-cerveza-cristal-355ml-x6",name:"Pack Cerveza Cristal",brand:"Cristal",category:"Cervezas",presentation:"Pack 6 x 355 ml",qty:2.13,unit:"L",synonyms:["cerveza","cristal","six pack"],
+    basePrices:{plazavea:24.90,wong:26.90,metro:25.90,tottus:25.50,vivanda:27.50}},
+  {id:"cerveza-cusquena-dorada-620ml",name:"Cerveza Cusqueña Dorada",brand:"Cusqueña",category:"Cervezas",presentation:"Botella 620 ml",qty:0.62,unit:"L",synonyms:["cerveza","cusquena"],
+    basePrices:{plazavea:9.90,wong:10.60,metro:10.30,tottus:10.10,vivanda:10.90}},
+  {id:"pack-cerveza-corona-355ml-x6",name:"Pack Cerveza Corona",brand:"Corona",category:"Cervezas",presentation:"Pack 6 x 355 ml",qty:2.13,unit:"L",synonyms:["cerveza","corona","six pack corona"],
+    basePrices:{plazavea:34.90,wong:37.90,metro:36.50,tottus:35.90,vivanda:38.90}},
+  {id:"pack-cerveza-heineken-355ml-x6",name:"Pack Cerveza Heineken",brand:"Heineken",category:"Cervezas",presentation:"Pack 6 x 355 ml",qty:2.13,unit:"L",synonyms:["cerveza","heineken"],
+    basePrices:{plazavea:32.90,wong:35.50,metro:34.20,tottus:33.90,vivanda:36.50}},
+  {id:"cerveza-cusquena-trigo-620ml",name:"Cerveza Cusqueña Trigo",brand:"Cusqueña",category:"Cervezas",presentation:"Botella 620 ml",qty:0.62,unit:"L",synonyms:["cerveza","cusquena trigo"],
+    basePrices:{plazavea:10.50,wong:11.30,metro:10.90,tottus:10.70,vivanda:11.60}},
+
+  {id:"pisco-quebranta-ocucaje-700ml",name:"Pisco Quebranta Ocucaje",brand:"Ocucaje",category:"Licores",presentation:"700 ml",qty:0.7,unit:"L",synonyms:["pisco"],
+    basePrices:{plazavea:39.90,wong:43.90,metro:41.90,tottus:40.90,vivanda:45.90}},
+  {id:"ron-cartavio-anejo-750ml",name:"Ron Cartavio Añejo",brand:"Cartavio",category:"Licores",presentation:"750 ml",qty:0.75,unit:"L",synonyms:["ron"],
+    basePrices:{plazavea:44.90,wong:48.90,metro:46.90,tottus:45.90,vivanda:49.90}},
+  {id:"whisky-johnnie-walker-red-750ml",name:"Whisky Johnnie Walker Red Label",brand:"Johnnie Walker",category:"Licores",presentation:"750 ml",qty:0.75,unit:"L",synonyms:["whisky"],
+    basePrices:{plazavea:79.90,wong:86.90,metro:83.90,tottus:81.90,vivanda:89.90}},
+  {id:"vino-tabernero-reserva-750ml",name:"Vino Tinto Tabernero Reserva",brand:"Tabernero",category:"Licores",presentation:"750 ml",qty:0.75,unit:"L",synonyms:["vino","vino tinto"],
+    basePrices:{plazavea:29.90,wong:32.90,metro:31.20,tottus:30.50,vivanda:34.20}},
+  {id:"vino-queirolo-blanco-750ml",name:"Vino Blanco Santiago Queirolo",brand:"Santiago Queirolo",category:"Licores",presentation:"750 ml",qty:0.75,unit:"L",synonyms:["vino blanco","vino"],
+    basePrices:{plazavea:26.90,wong:29.50,metro:28.10,tottus:27.50,vivanda:30.90}},
+
+  {id:"palta-fuerte-kg",name:"Palta Fuerte",brand:"Selección",category:"Frutas y Verduras",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["palta","aguacate"],
+    basePrices:{plazavea:6.90,wong:7.90,metro:7.20,tottus:6.80,vivanda:8.50}},
+  {id:"platano-seda-kg",name:"Plátano de Seda",brand:"Selección",category:"Frutas y Verduras",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["platano","banana"],
+    basePrices:{plazavea:3.20,wong:3.80,metro:3.40,tottus:3.30,vivanda:4.00}},
+  {id:"manzana-israel-kg",name:"Manzana Israel",brand:"Selección",category:"Frutas y Verduras",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["manzana"],
+    basePrices:{plazavea:5.90,wong:6.70,metro:6.20,tottus:5.95,vivanda:7.10}},
+  {id:"limon-kg",name:"Limón",brand:"Selección",category:"Frutas y Verduras",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["limon"],
+    basePrices:{plazavea:4.50,wong:5.20,metro:4.80,tottus:4.60,vivanda:5.50}},
+  {id:"tomate-italiano-kg",name:"Tomate Italiano",brand:"Selección",category:"Frutas y Verduras",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["tomate"],
+    basePrices:{plazavea:3.90,wong:4.50,metro:4.10,tottus:3.95,vivanda:4.80}},
+  {id:"cebolla-roja-kg",name:"Cebolla Roja",brand:"Selección",category:"Frutas y Verduras",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["cebolla"],
+    basePrices:{plazavea:2.90,wong:3.40,metro:3.10,tottus:2.95,vivanda:3.60}},
+  {id:"papa-blanca-kg",name:"Papa Blanca",brand:"Selección",category:"Frutas y Verduras",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["papa"],
+    basePrices:{plazavea:2.50,wong:2.90,metro:2.70,tottus:2.55,vivanda:3.10}},
+  {id:"naranja-jugo-kg",name:"Naranja de Jugo",brand:"Selección",category:"Frutas y Verduras",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["naranja"],
+    basePrices:{plazavea:3.50,wong:4.10,metro:3.80,tottus:3.60,vivanda:4.30}},
+
+  {id:"bistec-res-kg",name:"Bistec de Res",brand:"San Fernando",category:"Carnes y Pescados",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["carne","res","bistec"],
+    basePrices:{plazavea:28.90,wong:31.50,metro:30.20,tottus:29.50,vivanda:32.90}},
+  {id:"carne-molida-res-kg",name:"Carne Molida de Res",brand:"San Fernando",category:"Carnes y Pescados",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["carne molida","res molida"],
+    basePrices:{plazavea:24.90,wong:27.20,metro:26.10,tottus:25.50,vivanda:28.50}},
+  {id:"filete-perico-kg",name:"Filete de Perico",brand:"Pesquero",category:"Carnes y Pescados",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["pescado","filete de pescado","perico"],
+    basePrices:{plazavea:26.90,wong:29.90,metro:28.20,tottus:27.50,vivanda:31.20}},
+  {id:"chuleta-cerdo-kg",name:"Chuleta de Cerdo",brand:"San Fernando",category:"Carnes y Pescados",presentation:"Por Kg",qty:1,unit:"kg",synonyms:["cerdo","chuleta"],
+    basePrices:{plazavea:19.90,wong:21.90,metro:20.90,tottus:20.20,vivanda:22.80}},
+  {id:"tocino-ahumado-200g",name:"Tocino Ahumado",brand:"San Fernando",category:"Carnes y Pescados",presentation:"200 g",qty:0.2,unit:"kg",synonyms:["tocino","bacon"],
+    basePrices:{plazavea:9.90,wong:10.90,metro:10.40,tottus:10.10,vivanda:11.50}},
+
+  {id:"avena-quaker-tradicional-400g",name:"Avena Quaker Tradicional",brand:"Quaker",category:"Saludable",presentation:"400 g",qty:0.4,unit:"kg",synonyms:["avena"],
+    basePrices:{plazavea:6.50,wong:7.10,metro:6.80,tottus:6.60,vivanda:7.40}},
+  {id:"quinua-organica-500g",name:"Quinua Orgánica",brand:"Sol de Andes",category:"Saludable",presentation:"500 g",qty:0.5,unit:"kg",synonyms:["quinua","quinoa"],
+    basePrices:{plazavea:9.90,wong:10.90,metro:10.30,tottus:10.00,vivanda:11.50}},
+  {id:"leche-almendras-silk-1l",name:"Leche de Almendras Silk",brand:"Silk",category:"Saludable",presentation:"1 L",qty:1,unit:"L",synonyms:["leche vegetal","leche de almendras"],
+    basePrices:{plazavea:14.90,wong:16.20,metro:15.50,tottus:15.10,vivanda:16.90}},
+  {id:"barritas-cereal-quaker-x6",name:"Barritas de Cereal Quaker",brand:"Quaker",category:"Saludable",presentation:"Pack 6 unid",qty:6,unit:"unidad",synonyms:["barritas","barra de cereal"],
+    basePrices:{plazavea:11.90,wong:12.90,metro:12.30,tottus:12.00,vivanda:13.40}},
+  {id:"mix-frutos-secos-200g",name:"Mix de Frutos Secos",brand:"Nature's Heart",category:"Saludable",presentation:"200 g",qty:0.2,unit:"kg",synonyms:["frutos secos","mix"],
+    basePrices:{plazavea:13.90,wong:15.20,metro:14.50,tottus:14.10,vivanda:15.90}},
+  {id:"yogurt-griego-gloria-light-150g",name:"Yogurt Griego Gloria Light",brand:"Gloria",category:"Saludable",presentation:"150 g",qty:1,unit:"unidad",synonyms:["yogurt griego light","yogurt sin azucar"],
+    basePrices:{plazavea:4.10,wong:4.40,metro:4.20,tottus:4.15,vivanda:4.50}},
+
+  {id:"pan-frances-x10",name:"Pan Francés",brand:"Panadería",category:"Panadería",presentation:"Pack x10",qty:10,unit:"unidad",synonyms:["pan frances","pan"],
+    basePrices:{plazavea:4.90,wong:5.50,metro:5.10,tottus:4.95,vivanda:5.80}},
+  {id:"croissant-mantequilla-x4",name:"Croissant Mantequilla",brand:"Panadería",category:"Panadería",presentation:"Pack x4",qty:4,unit:"unidad",synonyms:["croissant"],
+    basePrices:{plazavea:9.90,wong:11.20,metro:10.50,tottus:10.10,vivanda:11.90}},
+  {id:"pan-pita-x6",name:"Pan Pita",brand:"Panadería",category:"Panadería",presentation:"Pack x6",qty:6,unit:"unidad",synonyms:["pan pita","pita"],
+    basePrices:{plazavea:6.90,wong:7.60,metro:7.20,tottus:7.00,vivanda:7.90}},
+  {id:"keke-ingles-bimbo-400g",name:"Keke Inglés Bimbo",brand:"Bimbo",category:"Panadería",presentation:"400 g",qty:0.4,unit:"kg",synonyms:["keke","queque"],
+    basePrices:{plazavea:8.90,wong:9.80,metro:9.30,tottus:9.00,vivanda:10.20}},
+
+  {id:"salsa-soya-kikkoman-150ml",name:"Salsa de Soya Kikkoman",brand:"Kikkoman",category:"Market Asiático",presentation:"150 ml",qty:0.15,unit:"L",synonyms:["sillao","soya","salsa de soya"],
+    basePrices:{plazavea:9.90,wong:10.90,metro:10.30,tottus:10.00,vivanda:11.50}},
+  {id:"sillao-naruto-500ml",name:"Sillao Naruto",brand:"Naruto",category:"Market Asiático",presentation:"500 ml",qty:0.5,unit:"L",synonyms:["sillao","salsa de soya"],
+    basePrices:{plazavea:7.50,wong:8.30,metro:7.90,tottus:7.70,vivanda:8.70}},
+  {id:"fideos-chinos-saltado-250g",name:"Fideos Chinos para Saltado",brand:"Yakisoba",category:"Market Asiático",presentation:"250 g",qty:0.25,unit:"kg",synonyms:["fideos chinos","tallarin saltado","fideos saltado"],
+    basePrices:{plazavea:5.90,wong:6.50,metro:6.10,tottus:5.95,vivanda:6.80}},
+  {id:"arroz-jazmin-1kg",name:"Arroz Jazmín",brand:"Genérico",category:"Market Asiático",presentation:"1 Kg",qty:1,unit:"kg",synonyms:["arroz jazmin","arroz asiatico"],
+    basePrices:{plazavea:8.90,wong:9.80,metro:9.30,tottus:9.00,vivanda:10.20}},
+  {id:"salsa-ostion-255g",name:"Salsa de Ostión",brand:"Lee Kum Kee",category:"Market Asiático",presentation:"255 g",qty:0.255,unit:"kg",synonyms:["salsa ostion","oyster sauce"],
+    basePrices:{plazavea:14.90,wong:16.50,metro:15.60,tottus:15.20,vivanda:17.20}},
+  {id:"sriracha-200ml",name:"Salsa Sriracha",brand:"Huy Fong",category:"Market Asiático",presentation:"200 ml",qty:0.2,unit:"L",synonyms:["sriracha","salsa picante"],
+    basePrices:{plazavea:12.90,wong:14.20,metro:13.50,tottus:13.10,vivanda:14.90}},
+
+  {id:"paracetamol-500mg-x10",name:"Paracetamol 500 mg",brand:"Genérico",category:"Farmacia",presentation:"Caja x10",qty:10,unit:"unidad",synonyms:["paracetamol","analgesico","dolor de cabeza"],
+    basePrices:{plazavea:4.50,wong:5.20,metro:4.80,tottus:4.60,vivanda:5.50}},
+  {id:"alcohol-gel-purell-250ml",name:"Alcohol en Gel Purell",brand:"Purell",category:"Farmacia",presentation:"250 ml",qty:0.25,unit:"L",synonyms:["alcohol gel","gel antibacterial"],
+    basePrices:{plazavea:8.90,wong:9.90,metro:9.30,tottus:9.00,vivanda:10.20}},
+  {id:"curitas-nexcare-x20",name:"Curitas Nexcare",brand:"Nexcare",category:"Farmacia",presentation:"Caja x20",qty:20,unit:"unidad",synonyms:["curitas","apositos"],
+    basePrices:{plazavea:6.90,wong:7.60,metro:7.20,tottus:7.00,vivanda:7.90}},
+  {id:"protector-solar-nivea-fps50-200ml",name:"Protector Solar Nivea Sun FPS50",brand:"Nivea",category:"Farmacia",presentation:"200 ml",qty:0.2,unit:"L",synonyms:["protector solar","bloqueador"],
+    basePrices:{plazavea:39.90,wong:43.90,metro:41.90,tottus:40.90,vivanda:45.50}},
+  {id:"panales-huggies-talla-m-x30",name:"Pañales Huggies Talla M",brand:"Huggies",category:"Farmacia",presentation:"Paquete x30",qty:30,unit:"unidad",synonyms:["panales","pañales"],
+    basePrices:{plazavea:34.90,wong:38.50,metro:36.90,tottus:35.90,vivanda:39.90}},
+  {id:"toallas-kotex-x10",name:"Toallas Higiénicas Kotex",brand:"Kotex",category:"Farmacia",presentation:"Paquete x10",qty:10,unit:"unidad",synonyms:["toallas higienicas","kotex"],
+    basePrices:{plazavea:9.90,wong:10.80,metro:10.30,tottus:10.00,vivanda:11.20}},
+  {id:"alcohol-medicinal-70-250ml",name:"Alcohol Medicinal 70°",brand:"Genérico",category:"Farmacia",presentation:"250 ml",qty:0.25,unit:"L",synonyms:["alcohol","alcohol medicinal"],
+    basePrices:{plazavea:3.90,wong:4.40,metro:4.10,tottus:3.95,vivanda:4.70}},
+
+  {id:"aceite-oliva-borges-500ml",name:"Aceite de Oliva Extra Virgen Borges",brand:"Borges",category:"Premium y Gourmet",presentation:"500 ml",qty:0.5,unit:"L",synonyms:["aceite de oliva","oliva extra virgen"],
+    basePrices:{plazavea:24.90,wong:27.90,metro:26.20,tottus:25.50,vivanda:29.90}},
+  {id:"queso-parmesano-reggianito-200g",name:"Queso Parmesano Reggianito",brand:"Importado",category:"Premium y Gourmet",presentation:"200 g",qty:0.2,unit:"kg",synonyms:["queso parmesano","parmesano"],
+    basePrices:{plazavea:19.90,wong:22.90,metro:21.20,tottus:20.50,vivanda:24.90}},
+  {id:"jamon-serrano-importado-100g",name:"Jamón Serrano Importado",brand:"Importado",category:"Premium y Gourmet",presentation:"100 g",qty:0.1,unit:"kg",synonyms:["jamon serrano","jamon"],
+    basePrices:{plazavea:22.90,wong:26.90,metro:24.90,tottus:23.90,vivanda:28.90}},
+  {id:"chocolate-lindt-100g",name:"Chocolate Lindt Excellence 70%",brand:"Lindt",category:"Premium y Gourmet",presentation:"100 g",qty:0.1,unit:"kg",synonyms:["chocolate","chocolate suizo"],
+    basePrices:{plazavea:14.90,wong:16.90,metro:15.90,tottus:15.20,vivanda:17.90}},
+  {id:"cafe-altomayo-grano-250g",name:"Café Gourmet en Grano Altomayo",brand:"Altomayo",category:"Premium y Gourmet",presentation:"250 g",qty:0.25,unit:"kg",synonyms:["cafe","cafe en grano","cafe gourmet"],
+    basePrices:{plazavea:17.90,wong:19.90,metro:18.90,tottus:18.20,vivanda:20.90}},
+  {id:"salmon-ahumado-noruego-150g",name:"Salmón Ahumado Noruego",brand:"Importado",category:"Premium y Gourmet",presentation:"150 g",qty:0.15,unit:"kg",synonyms:["salmon","salmon ahumado"],
+    basePrices:{plazavea:32.90,wong:37.90,metro:35.20,tottus:33.90,vivanda:39.90}}
+];
+const CHAIN_IDS = SUPERMARKETS.map(s=>s.id);
+PRODUCTS.forEach(p=>{
+  const vals = CHAIN_IDS.map(c=>p.basePrices[c]);
+  const rnd = mulberry32(hashStr("chainshuffle|"+p.id));
+  const order = CHAIN_IDS.slice();
+  for(let i=order.length-1;i>0;i--){ const j=Math.floor(rnd()*(i+1)); const t=order[i]; order[i]=order[j]; order[j]=t; }
+  const shuffled = {};
+  order.forEach((chain,i)=>{ shuffled[chain]=vals[i]; });
+  p.basePrices = shuffled;
+});
+const PRODUCT_BY_ID = Object.fromEntries(PRODUCTS.map(p=>[p.id,p]));
+
+const UNAVAILABLE = [
+  ["huevos-blancos-x30","vivanda"],["pollo-entero-san-fernando-kg","tottus"],
+  ["papel-noble-x4","wong"],["agua-san-luis-sin-gas-625ml","metro"],
+  ["pack-yogurt-griego-gloria-4x150g","plazavea"],
+  ["whisky-johnnie-walker-red-750ml","tottus"],["salmon-ahumado-noruego-150g","tottus"],
+  ["queso-parmesano-reggianito-200g","metro"],["sillao-naruto-500ml","vivanda"],
+  ["pan-pita-x6","metro"],["mix-frutos-secos-200g","plazavea"]
+];
+function isAvailable(pid,chain){ return !UNAVAILABLE.some(u=>u[0]===pid&&u[1]===chain); }
+
+const STALE_OVERRIDES = [
+  ["leche-gloria-deslactosada-1l","vivanda",2100],
+  ["fideos-don-vittorio-spaghetti-500g","tottus",1800],
+  ["pan-molde-bimbo-integral-650g","metro",3000]
+];
+function updatedMinutesAgo(pid,chain){
+  const o = STALE_OVERRIDES.find(s=>s[0]===pid&&s[1]===chain);
+  if(o) return o[2];
+  return 15 + (hashStr(pid+"|"+chain+"|upd") % 280);
+}
+function updatedAt(pid,chain){ return new Date(Date.now() - updatedMinutesAgo(pid,chain)*60000); }
+
+/* pricing */
+function priceAtStoreKey(product, chain, storeKey){
+  const base = product.basePrices[chain];
+  if(base==null) return null;
+  const mult = 0.965 + rand01("sv|"+storeKey+"|"+product.id)*0.07;
+  return Math.round(base*mult*10)/10;
+}
+function nearestStore(chain, loc){
+  if(!loc) return null;
+  let best=null,bestD=Infinity;
+  STORES.filter(s=>s.chain===chain).forEach(s=>{
+    const d = haversineKm(loc.lat,loc.lng,s.lat,s.lng);
+    if(d<bestD){bestD=d;best=s;}
+  });
+  return best ? {store:best, distanceKm:bestD} : null;
+}
+function chainOffer(product, chain, loc){
+  const available = isAvailable(product.id, chain);
+  const near = loc ? nearestStore(chain, loc) : null;
+  const storeKey = near ? near.store.id : chain+"-base";
+  const price = priceAtStoreKey(product, chain, storeKey);
+  return {
+    chain, price, available,
+    store: near ? near.store : null,
+    distanceKm: near ? near.distanceKm : null,
+    updated: updatedAt(product.id, chain)
+  };
+}
+function allOffers(product, loc){
+  return SUPERMARKETS.map(s=>chainOffer(product, s.id, loc));
+}
+function nearbyStoreOffers(product, loc, limit){
+  return STORES.map(s=>({
+    chain: s.chain,
+    price: priceAtStoreKey(product, s.chain, s.id),
+    available: isAvailable(product.id, s.chain),
+    store: s,
+    distanceKm: haversineKm(loc.lat, loc.lng, s.lat, s.lng),
+    updated: updatedAt(product.id, s.chain)
+  })).sort((a,b)=>a.distanceKm-b.distanceKm).slice(0, limit||8);
+}
+function unitPriceLabel(product, price){
+  let baseQty, label;
+  if(product.unit==="L"){ baseQty=product.qty; label="litro"; }
+  else if(product.unit==="ml"){ baseQty=product.qty/1000; label="litro"; }
+  else if(product.unit==="kg"){ baseQty=product.qty; label="kilo"; }
+  else if(product.unit==="g"){ baseQty=product.qty/1000; label="kilo"; }
+  else { baseQty=product.qty; label="unidad"; }
+  if(label==="unidad" && baseQty<=1) return null;
+  return formatSoles(price/baseQty) + " por " + label;
+}
+
+/* price history (deterministic 30-day walk ending at today's base price) */
+function priceHistory(product, chain){
+  const base = priceAtStoreKey(product, chain, chain+"-base");
+  const rnd = mulberry32(hashStr("hist|"+product.id+"|"+chain));
+  const days=30, vals=new Array(days);
+  vals[days-1]=base;
+  let v=base;
+  for(let i=days-2;i>=0;i--){ const delta=(rnd()-0.5)*0.05; v=v/(1+delta); vals[i]=Math.round(v*100)/100; }
+  return vals;
+}
+function historyInsight(vals){
+  const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
+  const today = vals[vals.length-1];
+  const pct = ((today-avg)/avg)*100;
+  return {avg, today, pct};
+}
+
+/* search */
+const SYNONYM_PHRASES = [
+  ["coca zero","coca-cola zero"],["coca cola zero","coca-cola zero"],["cocacola zero","coca-cola zero"],
+  ["papel elite","papel higienico elite"],["papel noble","papel higienico noble"],
+  ["gaseosa","bebida gaseosa"],["refresco","bebida"],["huevo","huevos"],["pollo entero","pollo"],
+  ["yogurt griego","yogurt griego"],["coca cola","coca-cola"],["cocacola","coca-cola"]
+];
+function expandQuery(q){
+  let out = q;
+  SYNONYM_PHRASES.forEach(([a,b])=>{ if(out.includes(a) && !out.includes(b)) out += " " + b; });
+  return out;
+}
+function productBlob(p){
+  if(p._blob) return p._blob;
+  const blob = normalize([p.name,p.brand,p.category,p.presentation,(p.synonyms||[]).join(" ")].join(" "));
+  p._blob = blob;
+  p._tokens = Array.from(new Set(blob.split(" ").filter(Boolean)));
+  p._nameBlob = normalize(p.name+" "+p.brand);
+  return blob;
+}
+function searchProducts(query, limit){
+  const nq = normalize(expandQuery(normalize(query)));
+  const qTokens = nq.split(" ").filter(Boolean);
+  if(qTokens.length===0) return [];
+  const scored = PRODUCTS.map(p=>{
+    productBlob(p);
+    let score=0;
+    for(const qt of qTokens){
+      if(qt.length<2) continue;
+      if(p._blob.includes(qt)){
+        score += p._nameBlob.includes(qt) ? 12 : 8;
+        if(p._nameBlob.startsWith(qt)) score += 4;
+        continue;
+      }
+      let best=Infinity;
+      for(const ht of p._tokens){
+        if(Math.abs(ht.length-qt.length)>3) continue;
+        const d = levenshtein(qt,ht);
+        if(d<best) best=d;
+      }
+      const tol = qt.length<=4?1:2;
+      if(best<=tol) score += Math.max(1, 8-best*3);
+    }
+    return {p, score};
+  }).filter(x=>x.score>0);
+  scored.sort((a,b)=>b.score-a.score);
+  return scored.slice(0, limit||40);
+}
+function closestSuggestion(query){
+  const res = searchProducts(query, 1);
+  return res.length ? res[0].p : null;
+}
+
+/* recommendation scoring */
+const DISTANCE_COST_PER_KM = 1.3;
+const MULTISTORE_HASSLE = 3.0;
+const MISSING_ITEM_PENALTY = 8.0;
+function optionScore({total, distanceKm, missing, storesVisited}){
+  return total + (distanceKm||0)*DISTANCE_COST_PER_KM + Math.max(0,storesVisited-1)*MULTISTORE_HASSLE + missing*MISSING_ITEM_PENALTY;
+}
+
+/* ---------------- state ---------------- */
+const state = {
+  screen: "home",
+  navStack: [],
+  location: storage.get("al_location", null),
+  list: storage.get("al_list", []),
+  favorites: storage.get("al_favorites", []),
+  userName: storage.get("al_username", null),
+  query: "",
+  sortMode: "price",
+  detailId: null,
+  modal: null
+};
+function saveList(){ storage.set("al_list", state.list); }
+function saveFav(){ storage.set("al_favorites", state.favorites); }
+function saveLoc(){ storage.set("al_location", state.location); }
+function saveName(){ storage.set("al_username", state.userName); }
+function greeting(){
+  const h = new Date().getHours();
+  if(h < 12) return "Buenos días";
+  if(h < 19) return "Buenas tardes";
+  return "Buenas noches";
+}
+
+function go(screen, opts){
+  opts = opts || {};
+  if(state.screen !== screen || opts.forcePush){ state.navStack.push({screen:state.screen, detailId:state.detailId}); }
+  state.screen = screen;
+  if("detailId" in opts) state.detailId = opts.detailId;
+  if("query" in opts) state.query = opts.query;
+  window.scrollTo(0,0);
+  render();
+}
+function goBack(){
+  const prev = state.navStack.pop();
+  if(prev){ state.screen=prev.screen; state.detailId=prev.detailId; } else { state.screen="home"; }
+  render();
+}
+function listQty(pid){ const it = state.list.find(x=>x.productId===pid); return it? it.qty : 0; }
+function setListQty(pid, qty){
+  qty = Math.max(0, Math.min(20, qty));
+  const idx = state.list.findIndex(x=>x.productId===pid);
+  if(qty===0){ if(idx>=0) state.list.splice(idx,1); }
+  else if(idx>=0){ state.list[idx].qty=qty; }
+  else { state.list.push({productId:pid, qty}); }
+  saveList();
+}
+function isFav(pid){ return state.favorites.includes(pid); }
+function toggleFav(pid){
+  const i = state.favorites.indexOf(pid);
+  if(i>=0) state.favorites.splice(i,1); else state.favorites.push(pid);
+  saveFav();
+}
+
+/* ---------------- actions ---------------- */
+const ACTIONS = {
+  "nav-home":()=>{ state.navStack=[]; state.screen="home"; render(); },
+  "nav-search":()=>{ state.navStack=[]; state.screen="search"; render(); focusSearchSoon(); },
+  "nav-list":()=>{ state.navStack=[]; state.screen="list"; render(); },
+  "nav-favorites":()=>{ state.navStack=[]; state.screen="favorites"; render(); },
+  "back":()=>goBack(),
+  "open-product":(el)=>go("product",{detailId:el.dataset.id, forcePush:true}),
+  "open-search":()=>{ go("search",{forcePush:true}); focusSearchSoon(); },
+  "open-nearby":()=>go("nearby",{forcePush:true}),
+  "open-offers":()=>go("offers",{forcePush:true}),
+  "open-location":()=>go("location",{forcePush:true}),
+  "open-about":()=>go("about",{forcePush:true}),
+  "open-list-result":()=>go("listResult",{forcePush:true}),
+  "close-modal":()=>{ state.modal=null; renderModal(); },
+  "toggle-fav":(el)=>{ toggleFav(el.dataset.id); render(); },
+  "qty-inc":(el)=>{ setListQty(el.dataset.id, listQty(el.dataset.id)+1); render(); },
+  "qty-dec":(el)=>{ setListQty(el.dataset.id, listQty(el.dataset.id)-1); render(); },
+  "qty-remove":(el)=>{ setListQty(el.dataset.id, 0); render(); },
+  "sort-mode":(el)=>{ if(el.hasAttribute("disabled")) return; state.sortMode=el.dataset.mode; render(); },
+  "use-geo":()=>{ requestGeolocation(); },
+  "set-district":(el)=>{
+    const d = DISTRICTS.find(x=>x.id===el.dataset.id);
+    if(d){ state.location={lat:d.lat,lng:d.lng,label:d.name,manual:true}; saveLoc(); go("home"); }
+  },
+  "clear-location":()=>{ state.location=null; saveLoc(); render(); },
+  "skip-location":()=>{ goBack(); },
+  "suggestion-pick":(el)=>{ state.query = el.dataset.q; render(); focusSearchSoon(true); },
+  "search-popular":(el)=>{ state.query = el.dataset.q; render(); focusSearchSoon(true); },
+  "noop":()=>{},
+  "open-name-modal":()=>{ state.modal={type:"name"}; renderModal(); setTimeout(()=>{ const el=document.getElementById("nameInput"); if(el){ el.focus(); el.select(); } },30); },
+  "save-name":()=>{
+    const el = document.getElementById("nameInput");
+    const v = el ? el.value.trim().slice(0,30) : "";
+    state.userName = v || null;
+    saveName();
+    state.modal = null;
+    renderModal();
+    render();
+  }
+};
+document.addEventListener("click", function(e){
+  const el = e.target.closest("[data-action]");
+  if(!el) return;
+  const fn = ACTIONS[el.dataset.action];
+  if(fn) fn(el, e);
+});
+document.addEventListener("input", function(e){
+  if(e.target.id==="searchInput"){ state.query = e.target.value; renderSearchResultsOnly(); }
+});
+document.addEventListener("keydown", function(e){
+  if(e.key==="Escape" && state.modal){ state.modal=null; renderModal(); }
+  if(e.key==="Enter" && e.target.id==="nameInput"){ ACTIONS["save-name"](); }
+});
+
+function focusSearchSoon(all){
+  setTimeout(()=>{ const el=document.getElementById("searchInput"); if(el){ el.focus(); if(all) el.select(); } },30);
+}
+
+function requestGeolocation(){
+  if(!("geolocation" in navigator)){
+    state.modal = {type:"error", text:"Este navegador no soporta geolocalización. Ingresa tu distrito manualmente."};
+    renderModal();
+    return;
+  }
+  state.modal = {type:"loading", text:"Obteniendo tu ubicación…"};
+  renderModal();
+  navigator.geolocation.getCurrentPosition(function(pos){
+    state.location = {lat:pos.coords.latitude, lng:pos.coords.longitude, label:"Tu ubicación actual", manual:false};
+    saveLoc();
+    state.modal=null;
+    go("home");
+  }, function(err){
+    state.modal = {type:"error", text:"No pudimos obtener tu ubicación automáticamente (" + (err && err.message ? err.message : "permiso denegado") + "). Elige tu distrito en la lista de abajo."};
+    renderModal();
+  }, {enableHighAccuracy:false, timeout:8000, maximumAge:600000});
+}
+
+/* ---------------- render: shell ---------------- */
+const PRIMARY_SCREENS = ["home","search","list","favorites"];
+function render(){
+  renderTopbar();
+  renderContent();
+  renderBottomNav();
+  renderModal();
+}
+
+function renderBottomNav(){
+  const el = document.getElementById("bottomnav");
+  if(!PRIMARY_SCREENS.includes(state.screen)){ el.style.display="none"; return; }
+  el.style.display="flex";
+  const items = [
+    {id:"home",label:"Inicio",icon:"home",action:"nav-home"},
+    {id:"search",label:"Buscar",icon:"search",action:"nav-search"},
+    {id:"list",label:"Lista",icon:"list",action:"nav-list",count:state.list.length},
+    {id:"favorites",label:"Favoritos",icon:"star",action:"nav-favorites",count:state.favorites.length}
+  ];
+  el.innerHTML = items.map(it=>`
+    <button class="navbtn ${state.screen===it.id?'active':''}" data-action="${it.action}">
+      <span class="dot">${ic(it.icon,20)}${it.count?`<span class="navcount">${it.count}</span>`:""}</span>
+      <span>${it.label}</span>
+    </button>
+  `).join("");
+}
+
+function backBtn(){ return `<button class="iconbtn" data-action="back" aria-label="Volver">${ic("chevronLeft")}</button>`; }
+
+function renderTopbar(){
+  const el = document.getElementById("topbar");
+  const s = state.screen;
+  if(s==="home"){
+    el.innerHTML = `
+      <div class="brandmark" style="flex:1;">
+        <div class="logo">${logoMark(20)}</div>
+        <div class="topbar-title">Ahorra Lima</div>
+      </div>
+      <button class="iconbtn" data-action="open-about" aria-label="Acerca de">${ic("info")}</button>`;
+  } else if(s==="search"){
+    el.innerHTML = `
+      ${backBtn()}
+      <div class="search-shell">
+        ${ic("search").replace("<svg ", '<svg class="icon-search" ')}
+        <input id="searchInput" class="search-input" type="text" inputmode="search" autocomplete="off"
+          placeholder="Ej. leche gloria, coca zero, pollo…" value="${esc(state.query)}" />
+      </div>`;
+  } else if(s==="list"){
+    el.innerHTML = `<div class="topbar-title" style="flex:1;">Mi lista</div>`;
+  } else if(s==="favorites"){
+    el.innerHTML = `<div class="topbar-title" style="flex:1;">Favoritos</div>`;
+  } else {
+    const titles = {product:"Producto", listResult:"Comparar lista", nearby:"Supermercados cercanos", location:"Tu ubicación", about:"Acerca de", offers:"Ofertas cercanas"};
+    el.innerHTML = `${backBtn()}<div class="topbar-title" style="flex:1;">${titles[s]||""}</div>`;
+  }
+}
+
+function renderContent(){
+  const el = document.getElementById("content");
+  el.classList.remove("fade-in"); void el.offsetWidth; el.classList.add("fade-in");
+  const map = {
+    home:screenHome, search:screenSearch, product:screenProduct, list:screenList,
+    listResult:screenListResult, favorites:screenFavorites, nearby:screenNearby,
+    offers:screenOffers, location:screenLocation, about:screenAbout
+  };
+  el.innerHTML = (map[state.screen]||screenHome)();
+  if(state.screen==="search") focusSearchSoon();
+}
+
+/* ---------------- small UI builders ---------------- */
+function chainPill(chainId){
+  const c = SM[chainId];
+  const bg = c.color, fg = isLight(c.color) ? "#1a1a1a" : "#fff";
+  return `<span class="chainpill" style="background:${bg};color:${fg};">
+    <span style="width:6px;height:6px;border-radius:2px;background:${fg};opacity:.85;"></span>${c.name}</span>`;
+}
+function freshnessBadge(offer){
+  if(!offer.available) return `<span class="badge badge-critical">Agotado</span>`;
+  if(isStale(offer.updated)) return `<span class="badge badge-warn">${ic("clock",11)} Sin verificar hoy</span>`;
+  return `<span class="badge badge-good">${ic("clock",11)} ${formatUpdated(offer.updated)}</span>`;
+}
+function starBtn(pid, size){
+  const fav = isFav(pid);
+  return `<button class="iconbtn" data-action="toggle-fav" data-id="${pid}" aria-label="Favorito" style="color:${fav?'var(--accent)':'var(--ink-3)'};">${ic(fav?"starFill":"star", size||20)}</button>`;
+}
+function qtyStepper(pid){
+  const qty = listQty(pid);
+  if(qty===0){
+    return `<button class="btn btn-ghost btn-sm" data-action="qty-inc" data-id="${pid}">${ic("plus",14)} Agregar</button>`;
+  }
+  return `<div class="qtystep">
+    <button data-action="qty-dec" data-id="${pid}" aria-label="Quitar uno">${ic("minus",14)}</button>
+    <span class="qtyval">${qty}</span>
+    <button data-action="qty-inc" data-id="${pid}" aria-label="Agregar uno">${ic("plus",14)}</button>
+  </div>`;
+}
+function sparkSVG(vals, color){
+  const w=120,h=40,pad=3;
+  const min=Math.min(...vals), max=Math.max(...vals);
+  const range = (max-min)||1;
+  const pts = vals.map((v,i)=>{
+    const x = pad + (i/(vals.length-1))*(w-pad*2);
+    const y = pad + (1-(v-min)/range)*(h-pad*2);
+    return x.toFixed(1)+","+y.toFixed(1);
+  }).join(" ");
+  const lastX = w-pad, lastY = pad + (1-(vals[vals.length-1]-min)/range)*(h-pad*2);
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+    <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${lastX}" cy="${lastY.toFixed(1)}" r="3" fill="${color}"/>
+  </svg>`;
+}
+function emptyState(icon, title, sub, actionHtml){
+  return `<div class="empty">${ic(icon,40)}<div class="empty-title">${title}</div><p class="subtle">${sub}</p>${actionHtml?`<div style="margin-top:14px;">${actionHtml}</div>`:""}</div>`;
+}
+function locationChip(){
+  if(state.location){
+    return `<button class="row card card-tap" data-action="open-location" style="width:100%;border:1px solid var(--border);">
+      <span style="color:var(--brand);">${ic("pin",18)}</span>
+      <span style="flex:1;text-align:left;font-size:13px;font-weight:700;">${esc(state.location.label)}</span>
+      ${ic("chevronRight",16)}
+    </button>`;
+  }
+  return `<button class="row card card-tap" data-action="open-location" style="width:100%;border:1px dashed var(--border);">
+    <span style="color:var(--ink-3);">${ic("pin",18)}</span>
+    <span style="flex:1;text-align:left;font-size:13px;font-weight:700;color:var(--ink-2);">Activa tu ubicación para ver distancias</span>
+    ${ic("chevronRight",16)}
+  </button>`;
+}
+
+/* ---------------- screen: home ---------------- */
+function offersNearYou(){
+  const results = [];
+  PRODUCTS.forEach(p=>{
+    SUPERMARKETS.forEach(s=>{
+      if(!isAvailable(p.id,s.id)) return;
+      const vals = priceHistory(p, s.id);
+      const {pct, today} = historyInsight(vals);
+      if(pct<=-8){
+        const near = state.location ? nearestStore(s.id, state.location) : null;
+        results.push({product:p, chain:s.id, pct, price:today, distanceKm: near?near.distanceKm:null});
+      }
+    });
+  });
+  results.sort((a,b)=> a.pct - b.pct);
+  return results;
+}
+function screenHome(){
+  const offers = offersNearYou().slice(0,3);
+  const nearbyChains = SUPERMARKETS.map(s=>({s, near: state.location? nearestStore(s.id,state.location): null}))
+    .sort((a,b)=>{
+      if(!state.location) return 0;
+      return (a.near?a.near.distanceKm:99) - (b.near?b.near.distanceKm:99);
+    }).slice(0,3);
+  return `
+    <button class="greeting-row" data-action="open-name-modal">
+      <span>${greeting()}${state.userName ? ", "+esc(state.userName) : ""}</span>
+      ${!state.userName ? `<span class="greeting-add">Agregar tu nombre</span>` : ""}
+    </button>
+    <h1 class="hero-title">¿Qué quieres comprar?</h1>
+    <button class="search-shell" data-action="open-search" style="display:block;width:100%;text-align:left;border:0;background:none;padding:0;margin-bottom:16px;">
+      ${ic("search").replace("<svg ", '<svg class="icon-search" ')}
+      <div class="search-input" style="color:var(--ink-3);">Buscar productos, marcas, categorías…</div>
+    </button>
+    <div style="margin-bottom:20px;">${locationChip()}</div>
+
+    <div class="stack">
+      <button class="card card-tap row-between" style="width:100%;border:0;text-align:left;" data-action="nav-list">
+        <div class="row" style="gap:12px;">
+          <span style="color:var(--brand);">${ic("list",22)}</span>
+          <div>
+            <div style="font-weight:800;font-size:14.5px;">Mi lista</div>
+            <div class="faint">${state.list.length ? state.list.length+" producto"+(state.list.length===1?"":"s") : "Aún no agregas productos"}</div>
+          </div>
+        </div>
+        ${ic("chevronRight",18)}
+      </button>
+
+      <button class="card card-tap row-between" style="width:100%;border:0;text-align:left;" data-action="open-offers">
+        <div class="row" style="gap:12px;">
+          <span style="color:var(--accent);">${ic("tag",22)}</span>
+          <div>
+            <div style="font-weight:800;font-size:14.5px;">Ofertas cercanas</div>
+            <div class="faint">${offers.length ? offers.length+" productos por debajo de su precio habitual" : "Sin ofertas destacadas hoy"}</div>
+          </div>
+        </div>
+        ${ic("chevronRight",18)}
+      </button>
+
+      <button class="card card-tap row-between" style="width:100%;border:0;text-align:left;" data-action="open-nearby">
+        <div class="row" style="gap:12px;">
+          <span style="color:var(--ink-2);">${ic("store",22)}</span>
+          <div>
+            <div style="font-weight:800;font-size:14.5px;">Supermercados cercanos</div>
+            <div class="faint">${state.location ? "Ver las 5 cadenas cerca de ti" : "Activa tu ubicación para ver distancias"}</div>
+          </div>
+        </div>
+        ${ic("chevronRight",18)}
+      </button>
+    </div>
+
+    ${offers.length ? `
+    <hr class="divider"/>
+    <p class="section-label">Buenos precios ahora</p>
+    <div class="stack-sm">
+      ${offers.map(o=>`
+        <button class="card card-tap row-between" style="width:100%;border:0;text-align:left;" data-action="open-product" data-id="${o.product.id}">
+          <div style="min-width:0;">
+            <div style="font-weight:700;font-size:13.5px;">${esc(o.product.name)} <span class="faint">${esc(o.product.presentation)}</span></div>
+            <div class="row" style="margin-top:4px;gap:6px;">${chainPill(o.chain)}<span class="badge badge-good">${Math.round(-o.pct)}% menos</span></div>
+          </div>
+          <div class="price">${formatSoles(o.price)}</div>
+        </button>
+      `).join("")}
+    </div>` : ""}
+  `;
+}
+
+/* ---------------- screen: search ---------------- */
+function popularChips(){
+  const popular = ["leche gloria","pollo","coca zero","papel elite","cerveza","palta","pisco","avena","salmón","pan"];
+  return `<div class="chipbar">${popular.map(q=>`<button class="chip" data-action="search-popular" data-q="${esc(q)}">${esc(q)}</button>`).join("")}</div>`;
+}
+function searchResultsHTML(){
+  const q = state.query.trim();
+  if(!q){
+    return `<p class="section-label">Búsquedas populares</p>${popularChips()}
+      <hr class="divider"/>
+      <p class="section-label">Categorías</p>
+      <div class="chipbar">${CATEGORIES.map(c=>`<button class="chip" data-action="search-popular" data-q="${esc(c)}">${esc(c)}</button>`).join("")}</div>`;
+  }
+  const results = searchProducts(q, 30);
+  if(results.length===0){
+    const sug = closestSuggestion(q.slice(0, Math.max(3,q.length-2)));
+    return emptyState("search","Sin resultados para “"+esc(q)+"”",
+      "Prueba con menos palabras o revisa la ortografía.",
+      sug ? `<button class="link-btn" data-action="suggestion-pick" data-q="${esc(sug.name)}">¿Quisiste decir “${esc(sug.name)}”?</button>` : "");
+  }
+  return `<div class="stack-sm">${results.map(r=>productResultRow(r.p)).join("")}</div>`;
+}
+function chainPriceChip(o, isCheapest){
+  const c = SM[o.chain];
+  return `
+    <div class="chainchip ${isCheapest?"cheapest":""} ${!o.available?"unavail":""}">
+      <div class="toprow">
+        <span class="dot" style="background:${c.color};"></span>
+        <span class="cname">${c.name}</span>
+        <span class="cprice">${o.available?formatSoles(o.price):"Agotado"}</span>
+      </div>
+      ${o.store ? `<div class="cdist">${esc(o.store.place)}${o.distanceKm!=null?" · "+formatDistance(o.distanceKm):""}</div>` : ""}
+    </div>`;
+}
+function nearbyDisplayOffers(p, limit){
+  limit = limit || 10;
+  if(state.location) return nearbyStoreOffers(p, state.location, limit);
+  return STORES.map(s=>({
+    chain: s.chain,
+    price: priceAtStoreKey(p, s.chain, s.id),
+    available: isAvailable(p.id, s.chain),
+    store: s,
+    distanceKm: null,
+    updated: updatedAt(p.id, s.chain)
+  })).sort((a,b)=>{
+    if(a.available!==b.available) return a.available?-1:1;
+    return a.price-b.price;
+  }).slice(0, limit);
+}
+function productResultRow(p){
+  const display = nearbyDisplayOffers(p);
+  const cheapest = display.filter(o=>o.available).sort((a,b)=>a.price-b.price)[0];
+  return `
+    <div class="card" style="cursor:pointer;" data-action="open-product" data-id="${p.id}">
+      <div class="row-between" style="margin-bottom:10px;">
+        <div style="min-width:0;flex:1;">
+          <div style="font-weight:700;font-size:14px;">${esc(p.name)}</div>
+          <div class="faint" style="margin-top:2px;">${esc(p.brand)} · ${esc(p.presentation)}</div>
+        </div>
+        ${cheapest ? `<div class="price" style="flex-shrink:0;">${formatSoles(cheapest.price)}</div>` : `<div class="faint">Agotado</div>`}
+      </div>
+      <div class="chaingrid">
+        ${display.map((o,i)=>chainPriceChip(o, cheapest && o===cheapest)).join("")}
+      </div>
+    </div>`;
+}
+function screenSearch(){ return `<div id="searchResults">${searchResultsHTML()}</div>`; }
+function renderSearchResultsOnly(){
+  const el = document.getElementById("searchResults");
+  if(el) el.innerHTML = searchResultsHTML();
+}
+
+/* ---------------- screen: product detail ---------------- */
+function screenProduct(){
+  const p = PRODUCT_BY_ID[state.detailId];
+  if(!p) return emptyState("search","Producto no encontrado","Vuelve a intentar la búsqueda.");
+  const offers = allOffers(p, state.location);
+  const availableOffers = offers.filter(o=>o.available);
+  const cheapest = availableOffers.slice().sort((a,b)=>a.price-b.price)[0];
+  const nearest = state.location ? availableOffers.slice().filter(o=>o.distanceKm!=null).sort((a,b)=>a.distanceKm-b.distanceKm)[0] : null;
+  const combo = availableOffers.slice().sort((a,b)=>optionScore({total:a.price,distanceKm:a.distanceKm||0,missing:0,storesVisited:1}) - optionScore({total:b.price,distanceKm:b.distanceKm||0,missing:0,storesVisited:1}))[0];
+
+  let sorted = offers.slice();
+  if(state.sortMode==="price"){ sorted.sort((a,b)=>(a.available===b.available? a.price-b.price : (a.available?-1:1))); }
+  else if(state.sortMode==="distance"){ sorted.sort((a,b)=>{ if(!state.location) return 0; return (a.distanceKm??99)-(b.distanceKm??99); }); }
+  else { sorted.sort((a,b)=>{
+      const sa = a.available? optionScore({total:a.price,distanceKm:a.distanceKm||0,missing:0,storesVisited:1}) : Infinity;
+      const sb = b.available? optionScore({total:b.price,distanceKm:b.distanceKm||0,missing:0,storesVisited:1}) : Infinity;
+      return sa-sb;
+    }); }
+
+  const histOfCheapest = cheapest ? priceHistory(p, cheapest.chain) : null;
+  const insight = histOfCheapest ? historyInsight(histOfCheapest) : null;
+
+  return `
+  <div class="row-between" style="margin-bottom:4px;">
+    <div style="flex:1;min-width:0;">
+      <h2 style="font-size:19px;font-weight:800;">${esc(p.name)}</h2>
+      <p class="subtle">${esc(p.brand)} · ${esc(p.presentation)}</p>
+    </div>
+    ${starBtn(p.id,22)}
+  </div>
+
+  ${cheapest ? `
+  <div style="margin:14px 0;">
+    <div class="price price-lg">${formatSoles(cheapest.price)}</div>
+    ${unitPriceLabel(p,cheapest.price) ? `<div class="unitprice">${unitPriceLabel(p,cheapest.price)}</div>` : ""}
+    <div class="faint" style="margin-top:4px;">Precio más bajo hoy · ${chainPillPlain(cheapest.chain)}</div>
+  </div>` : `<div class="stale-note" style="margin:14px 0;">Ninguna tienda tiene este producto disponible en este momento.</div>`}
+
+  ${insight ? `
+  <div class="card" style="margin-bottom:16px;">
+    <div class="sparkwrap">
+      ${sparkSVG(histOfCheapest, insight.pct<=-3?"var(--good)": insight.pct>=3?"var(--critical)":"var(--ink-3)")}
+      <div style="flex:1;">
+        <div class="row" style="gap:6px;">
+          ${ic(insight.pct<0?"trendDown":"trendUp",16)}
+          <span style="font-weight:800;font-size:13.5px;">${Math.abs(insight.pct).toFixed(0)}% ${insight.pct<0?"por debajo":"por encima"} del promedio</span>
+        </div>
+        <p class="faint" style="margin-top:3px;">Promedio de 30 días: ${formatSoles(insight.avg)}. ${insight.pct<=-8?"Buen momento para comprar.":insight.pct>=8?"Está más caro de lo habitual.":"Precio estable respecto a lo usual."}</p>
+      </div>
+    </div>
+  </div>` : ""}
+
+  <div class="chipbar" style="margin-bottom:12px;">
+    <button class="chip ${state.sortMode==='price'?'active':''}" data-action="sort-mode" data-mode="price">${ic("scale",14)} Más barato</button>
+    <button class="chip ${state.sortMode==='distance'?'active':''}" data-action="sort-mode" data-mode="distance" ${!state.location?"disabled":""}>${ic("walk",14)} Más cercano</button>
+    <button class="chip ${state.sortMode==='combo'?'active':''}" data-action="sort-mode" data-mode="combo">${ic("sliders",14)} Mejor combinación</button>
+  </div>
+  ${!state.location ? `<p class="faint" style="margin:-4px 0 12px;">Activa tu ubicación para ordenar por cercanía. <button class="link-btn" data-action="open-location">Activar</button></p>` : ""}
+
+  <div class="stack-sm">
+    ${sorted.map(o=>{
+      const isCheapest = cheapest && o.chain===cheapest.chain;
+      const isNearest = nearest && o.chain===nearest.chain;
+      const isCombo = combo && o.chain===combo.chain;
+      return `
+      <div class="store-row ${!o.available?'unavailable':(isCombo&&state.sortMode==='combo')||(isCheapest&&state.sortMode==='price')||(isNearest&&state.sortMode==='distance')?'winner':''}">
+        <div style="width:10px;height:10px;border-radius:3px;background:${SM[o.chain].color};flex-shrink:0;"></div>
+        <div class="store-info">
+          <div class="store-name">${SM[o.chain].name}</div>
+          <div class="store-meta">${o.store ? esc(o.store.place)+" · "+esc(o.store.district) : "Sucursal más cercana no calculada"}${o.distanceKm!=null? " · "+formatDistance(o.distanceKm):""}</div>
+          <div class="badgerow">
+            ${isCheapest?'<span class="badge badge-accent">Más barato</span>':""}
+            ${isNearest?'<span class="badge badge-brand">Más cercano</span>':""}
+            ${isCombo?'<span class="badge badge-good">Mejor combinación</span>':""}
+            ${freshnessBadge(o)}
+          </div>
+        </div>
+        <div class="store-price">
+          ${o.available ? `<div class="price">${formatSoles(o.price)}</div>${unitPriceLabel(p,o.price)?`<div class="unitprice">${unitPriceLabel(p,o.price)}</div>`:""}` : `<div class="faint">No disponible</div>`}
+        </div>
+      </div>`;
+    }).join("")}
+  </div>
+
+  <div class="row" style="margin-top:18px;gap:10px;">
+    <div style="flex:1;">${qtyStepper(p.id)}</div>
+    ${listQty(p.id)>0 ? `<button class="btn btn-primary" data-action="nav-list">Ver mi lista</button>` : ""}
+  </div>
+  `;
+}
+function chainPillPlain(chain){ return SM[chain].name; }
+
+/* ---------------- screen: list ---------------- */
+function screenList(){
+  if(state.list.length===0){
+    return emptyState("list","Tu lista está vacía","Agrega productos para comparar el costo total en cada supermercado.",
+      `<button class="btn btn-primary" data-action="open-search">Buscar productos</button>`);
+  }
+  const rows = state.list.map(item=>{
+    const p = PRODUCT_BY_ID[item.productId];
+    if(!p) return "";
+    const offers = allOffers(p, state.location).filter(o=>o.available);
+    const cheapest = offers.slice().sort((a,b)=>a.price-b.price)[0];
+    return `
+    <div class="listitem">
+      <div style="flex:1;min-width:0;">
+        <div class="listitem-name">${esc(p.name)}</div>
+        <div class="listitem-meta">${esc(p.presentation)} ${cheapest?"· desde "+formatSoles(cheapest.price):""}</div>
+      </div>
+      ${qtyStepper(p.id)}
+    </div>`;
+  }).join("");
+  return `
+    <div class="stack-sm">${rows}</div>
+    <div class="row" style="margin-top:16px;gap:10px;">
+      <button class="btn btn-ghost" data-action="open-search">${ic("plus",16)} Agregar más</button>
+      <button class="btn btn-accent btn-block" style="flex:1;" data-action="open-list-result">Comparar precios</button>
+    </div>
+  `;
+}
+
+/* ---------------- comparison engine ---------------- */
+function buildComparison(){
+  const items = state.list.map(it=>({item:it, product:PRODUCT_BY_ID[it.productId]})).filter(x=>x.product);
+  const totalItems = items.length;
+
+  const perChain = SUPERMARKETS.map(s=>{
+    let total=0, available=0, missing=[];
+    items.forEach(({item,product})=>{
+      if(isAvailable(product.id, s.id)){
+        const price = priceAtStoreKey(product, s.id, (state.location&&nearestStore(s.id,state.location))? nearestStore(s.id,state.location).store.id : s.id+"-base");
+        total += price*item.qty; available++;
+      } else { missing.push(product); }
+    });
+    const near = state.location ? nearestStore(s.id, state.location) : null;
+    return {chain:s.id, total, available, missing, distanceKm: near?near.distanceKm:null, storesVisited:1,
+      score: optionScore({total, distanceKm: near?near.distanceKm:0, missing:missing.length, storesVisited:1})};
+  });
+  const perChainFull = perChain.filter(c=>c.available>0).sort((a,b)=>a.total-b.total);
+
+  const comboByChain = {};
+  let comboTotal=0, comboMissing=[];
+  items.forEach(({item,product})=>{
+    let best=null;
+    SUPERMARKETS.forEach(s=>{
+      if(!isAvailable(product.id,s.id)) return;
+      const near = state.location ? nearestStore(s.id,state.location) : null;
+      const price = priceAtStoreKey(product, s.id, near? near.store.id : s.id+"-base");
+      if(!best || price<best.price) best = {chain:s.id, price};
+    });
+    if(best){
+      comboTotal += best.price*item.qty;
+      (comboByChain[best.chain] = comboByChain[best.chain]||[]).push({product, qty:item.qty, price:best.price});
+    } else { comboMissing.push(product); }
+  });
+  const comboChains = Object.keys(comboByChain);
+  const comboDistances = comboChains.map(c=>{
+    const near = state.location? nearestStore(c,state.location) : null;
+    return {chain:c, distanceKm: near? near.distanceKm : null};
+  });
+  const comboDistanceSum = state.location ? comboDistances.reduce((a,c)=>a+(c.distanceKm||0),0) : null;
+  const comboOption = {
+    total: comboTotal, chains: comboChains, byChain: comboByChain, missing: comboMissing,
+    distanceKm: comboDistanceSum, storesVisited: comboChains.length,
+    score: optionScore({total:comboTotal, distanceKm: comboDistanceSum||0, missing:comboMissing.length, storesVisited:comboChains.length})
+  };
+
+  const allOptions = [...perChainFull.map(c=>({type:"single", ...c})), {type:"combo", ...comboOption}];
+  const recommended = allOptions.slice().sort((a,b)=>a.score-b.score)[0];
+  const completeOptions = allOptions.filter(o=>o.missing.length===0);
+  const cheapestPool = completeOptions.length ? completeOptions : allOptions;
+  const cheapestOverall = cheapestPool.slice().sort((a,b)=>a.total-b.total)[0];
+
+  return {totalItems, perChainFull, comboOption, recommended, cheapestOverall};
+}
+
+function screenListResult(){
+  if(state.list.length===0) return emptyState("list","Tu lista está vacía","Agrega productos primero.", `<button class="btn btn-primary" data-action="open-search">Buscar productos</button>`);
+  const cmp = buildComparison();
+  const rec = cmp.recommended;
+  const cheap = cmp.cheapestOverall;
+  const sameOption = rec===cheap || (rec.type===cheap.type && rec.chain===cheap.chain);
+
+  function optionLabel(o){ return o.type==="combo" ? "Combinar " + o.chains.map(c=>SM[c].name).join(" + ") : SM[o.chain].name; }
+  function optionCard(o, kind){
+    const badge = kind==="rec" ? '<span class="badge badge-good">Recomendado</span>' : '<span class="badge badge-accent">Más barato</span>';
+    const missingCount = o.type==="combo" ? o.missing.length : o.missing.length;
+    return `
+    <div class="card ${kind==='rec'?'card-brand':'card-accent'}">
+      <div class="row-between" style="margin-bottom:8px;">
+        <span style="font-weight:800;font-size:14.5px;">${optionLabel(o)}</span>${badge}
+      </div>
+      <div class="price price-lg">${formatSoles(o.total)}</div>
+      <div class="stack-sm" style="margin-top:10px;">
+        ${state.location && o.distanceKm!=null ? `<div class="row faint" style="gap:6px;">${ic("walk",14)} ${o.type==="combo"?"Distancia total aprox.: ":"Distancia: "}${formatDistance(o.distanceKm)}</div>` : ""}
+        <div class="row faint" style="gap:6px;">${ic("check",14)} Productos disponibles: ${cmp.totalItems-missingCount}/${cmp.totalItems}</div>
+        ${o.type==="combo" ? `<div class="row faint" style="gap:6px;">${ic("store",14)} ${o.storesVisited} supermercado${o.storesVisited===1?"":"s"} a visitar</div>` : ""}
+      </div>
+    </div>`;
+  }
+
+  let savingsMsg = "";
+  if(!sameOption){
+    const savings = cheap.total - rec.total >= 0 ? (rec.total-cheap.total)*-1 : 0;
+    const realSavings = rec.total - cheap.total;
+    const extraDistance = state.location && rec.distanceKm!=null && cheap.distanceKm!=null ? Math.max(0, cheap.distanceKm - (rec.type==='single'? rec.distanceKm : 0)) : null;
+    if(state.location && cheap.distanceKm!=null){
+      const perKm = extraDistance>0 ? realSavings/extraDistance : Infinity;
+      savingsMsg = perKm>=2.5 || extraDistance<=0.3
+        ? `Vale la pena: ahorras ${formatSoles(realSavings)} y la ruta adicional es de solo ${formatDistance(extraDistance||0)}.`
+        : `Ahorras ${formatSoles(realSavings)} pero recorrerías ${formatDistance(extraDistance||0)} adicionales. Quizás te conviene simplemente comprar todo en ${optionLabel(rec)}.`;
+    } else {
+      savingsMsg = `Podrías ahorrar ${formatSoles(realSavings)} combinando supermercados. Activa tu ubicación para saber si la distancia extra vale la pena.`;
+    }
+  }
+
+  return `
+  <p class="section-label">Mejor opción para ti</p>
+  ${optionCard(rec,"rec")}
+  ${!sameOption ? `
+  <p class="section-label" style="margin-top:18px;">Alternativa más barata</p>
+  ${optionCard(cheap,"cheap")}
+  <div class="freshbar" style="margin-top:10px;">${ic("info",16)} ${savingsMsg}</div>
+  ` : ""}
+
+  ${cmp.comboOption.chains.length>0 ? `
+  <hr class="divider"/>
+  <p class="section-label">Cómo se reparte la combinación</p>
+  <div class="stack-sm">
+    ${cmp.comboOption.chains.map(c=>`
+      <div class="card">
+        <div class="row" style="margin-bottom:6px;">${chainPill(c)}</div>
+        ${cmp.comboOption.byChain[c].map(x=>`<div class="row-between" style="font-size:13px;padding:3px 0;"><span>${x.qty>1?x.qty+"× ":""}${esc(x.product.name)}</span><span class="faint">${formatSoles(x.price*x.qty)}</span></div>`).join("")}
+      </div>
+    `).join("")}
+  </div>` : ""}
+
+  <hr class="divider"/>
+  <p class="section-label">Comprando todo en un solo lugar</p>
+  <div class="scrollx">
+  <table class="plain">
+    <tbody>
+    ${cmp.perChainFull.map((c,i)=>`
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:10px 4px;"><div class="row" style="gap:8px;">${chainPill(c.chain)}${c.missing.length?`<span class="faint">(${c.missing.length} sin stock)</span>`:""}</div></td>
+        <td style="padding:10px 4px;text-align:right;" class="price">${formatSoles(c.total)}</td>
+      </tr>`).join("")}
+    </tbody>
+  </table>
+  </div>
+  `;
+}
+
+/* ---------------- screen: favorites ---------------- */
+function screenFavorites(){
+  if(state.favorites.length===0){
+    return emptyState("star","Aún no tienes favoritos","Guarda los productos que compras seguido para encontrarlos más rápido.",
+      `<button class="btn btn-primary" data-action="open-search">Buscar productos</button>`);
+  }
+  const rows = state.favorites.map(pid=>PRODUCT_BY_ID[pid]).filter(Boolean).map(p=>{
+    const display = nearbyDisplayOffers(p);
+    const cheapest = display.filter(o=>o.available).sort((a,b)=>a.price-b.price)[0];
+    return `
+    <div class="card" style="cursor:pointer;" data-action="open-product" data-id="${p.id}">
+      <div class="row-between" style="margin-bottom:10px;">
+        <div style="min-width:0;flex:1;">
+          <div style="font-weight:700;font-size:14px;">${esc(p.name)}</div>
+          <div class="faint" style="margin-top:2px;">${esc(p.brand)} · ${esc(p.presentation)}</div>
+        </div>
+        <div class="row" style="gap:6px;flex-shrink:0;">
+          ${cheapest?`<div class="price">${formatSoles(cheapest.price)}</div>`:`<div class="faint">Agotado</div>`}
+          ${starBtn(p.id,20)}
+        </div>
+      </div>
+      <div class="chaingrid">
+        ${display.map(o=>chainPriceChip(o, cheapest && o===cheapest)).join("")}
+      </div>
+    </div>`;
+  }).join("");
+  return `<div class="stack-sm">${rows}</div>`;
+}
+
+/* ---------------- screen: offers ---------------- */
+function screenOffers(){
+  const offers = offersNearYou();
+  if(offers.length===0) return emptyState("tag","Sin ofertas destacadas","Vuelve a revisar más tarde.");
+  return `<div class="stack-sm">${offers.map(o=>`
+    <div class="card row-between" style="cursor:pointer;" data-action="open-product" data-id="${o.product.id}">
+      <div style="min-width:0;flex:1;">
+        <div style="font-weight:700;font-size:14px;">${esc(o.product.name)}</div>
+        <div class="faint" style="margin-top:2px;">${esc(o.product.presentation)}</div>
+        <div class="row" style="margin-top:6px;gap:6px;">${chainPill(o.chain)}<span class="badge badge-good">${Math.round(-o.pct)}% menos que su promedio</span></div>
+      </div>
+      <div class="price">${formatSoles(o.price)}</div>
+    </div>`).join("")}</div>`;
+}
+
+/* ---------------- screen: nearby ---------------- */
+function screenNearby(){
+  if(!state.location){
+    return emptyState("pin","Activa tu ubicación","Así podremos mostrarte qué sucursal de cada supermercado te queda más cerca.",
+      `<button class="btn btn-primary" data-action="open-location">Configurar ubicación</button>`);
+  }
+  const rows = STORES.map(s=>({s, d: haversineKm(state.location.lat,state.location.lng,s.lat,s.lng)})).sort((a,b)=>a.d-b.d);
+  return `<div class="stack-sm">${rows.map(r=>`
+    <div class="store-row">
+      <div style="width:10px;height:10px;border-radius:3px;background:${SM[r.s.chain].color};flex-shrink:0;"></div>
+      <div class="store-info">
+        <div class="store-name">${r.s.name}</div>
+        <div class="store-meta">${esc(r.s.place)} · ${esc(r.s.district)}</div>
+      </div>
+      <div class="store-price"><div style="font-weight:800;">${formatDistance(r.d)}</div></div>
+    </div>`).join("")}</div>`;
+}
+
+/* ---------------- screen: location ---------------- */
+function screenLocation(){
+  return `
+  <p class="subtle" style="margin-bottom:16px;">Usamos tu ubicación solo en este dispositivo para calcular qué sucursal de cada supermercado te queda más cerca y estimar el costo de ir a comprar. No se envía a ningún servidor.</p>
+  ${state.location ? `
+  <div class="card card-brand" style="margin-bottom:16px;">
+    <div class="row" style="gap:8px;">${ic("pin",18)}<span style="font-weight:700;">${esc(state.location.label)}</span></div>
+  </div>
+  <button class="btn btn-ghost btn-block" data-action="clear-location" style="margin-bottom:20px;">Quitar ubicación</button>
+  ` : `
+  <button class="btn btn-primary btn-block" data-action="use-geo" style="margin-bottom:20px;">${ic("pin",18)} Usar mi ubicación actual</button>
+  `}
+  <p class="section-label">O elige tu distrito</p>
+  <div class="stack-sm">
+    ${DISTRICTS.map(d=>`<button class="card card-tap row-between" style="width:100%;border:0;text-align:left;" data-action="set-district" data-id="${d.id}">
+      <span style="font-weight:700;font-size:13.5px;">${esc(d.name)}</span>${state.location&&state.location.label===d.name?ic("check",16):""}
+    </button>`).join("")}
+  </div>
+  `;
+}
+
+/* ---------------- screen: about ---------------- */
+function screenAbout(){
+  return `
+  <div class="row" style="gap:10px;margin-bottom:16px;">
+    <div class="logo" style="width:44px;height:44px;">${logoMark(28)}</div>
+    <div>
+      <div style="font-weight:800;font-size:16px;">Ahorra Lima</div>
+      <div class="faint">MVP de demostración</div>
+    </div>
+  </div>
+  <div class="stack">
+    <p class="subtle">Ahorra Lima ayuda a encontrar en qué supermercado conviene comprar un producto o una lista completa, comparando precios y la distancia hasta cada tienda. Es gratuita: sin publicidad ni suscripciones en esta primera versión.</p>
+    <div class="card">
+      <p style="font-weight:800;font-size:13.5px;margin-bottom:6px;">Sobre estos datos</p>
+      <p class="subtle">Este prototipo simula Plaza Vea, Wong, Metro, Tottus y Vivanda con precios de ejemplo generados de forma determinística (variación por tienda, historial de 30 días y frescura de cada dato). En producción, un servicio de actualización diaria obtendría los precios reales desde cada supermercado, los normalizaría a un catálogo común y publicaría fecha y hora de verificación — sin depender de que los usuarios los reporten.</p>
+    </div>
+    <div class="card">
+      <p style="font-weight:800;font-size:13.5px;margin-bottom:6px;">Privacidad</p>
+      <p class="subtle">Tu ubicación y tu lista de compras se guardan solo en este dispositivo. Puedes usar la app sin compartir ubicación, escribiendo tu distrito manualmente.</p>
+    </div>
+  </div>
+  `;
+}
+
+/* ---------------- modal ---------------- */
+function renderModal(){
+  const root = document.getElementById("modalRoot");
+  if(!state.modal){ root.innerHTML=""; return; }
+  const m = state.modal;
+  let body = "";
+  if(m.type==="loading"){
+    body = `<div class="empty" style="padding:24px 0;">${ic("pin",34)}<p class="subtle" style="margin-top:10px;">${esc(m.text)}</p></div>`;
+  } else if(m.type==="error"){
+    body = `<div class="stack">
+      <div class="row" style="gap:8px;"><span style="color:var(--warning);">${ic("info",20)}</span><strong>No pudimos ubicarte</strong></div>
+      <p class="subtle">${esc(m.text)}</p>
+      <button class="btn btn-primary btn-block" data-action="close-modal">Entendido</button>
+    </div>`;
+  } else if(m.type==="name"){
+    body = `<div class="stack">
+      <div>
+        <strong style="font-size:16px;">¿Cómo te llamas?</strong>
+        <p class="subtle" style="margin-top:4px;">Lo usamos solo para saludarte. Se guarda únicamente en este dispositivo.</p>
+      </div>
+      <input id="nameInput" class="search-input" type="text" autocomplete="off" maxlength="30"
+        placeholder="Tu nombre" value="${esc(state.userName||"")}" style="padding-left:14px;" />
+      <button class="btn btn-primary btn-block" data-action="save-name">Guardar</button>
+    </div>`;
+  }
+  root.innerHTML = `<div class="modalback" data-action="close-modal">
+    <div class="modalcard" data-action="noop">
+      ${m.type!=='loading' ? `<div class="row-between" style="margin-bottom:12px;"><strong></strong><button class="iconbtn" data-action="close-modal">${ic("close")}</button></div>`:""}
+      ${body}
+    </div>
+  </div>`;
+}
+
+render();
+})();
+</script>
+
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("sw.js").catch(() => {});
+    });
+  }
+</script>
+</body>
+</html>

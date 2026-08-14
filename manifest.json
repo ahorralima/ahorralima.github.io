@@ -1,0 +1,17 @@
+{
+  "name": "Ahorra Lima",
+  "short_name": "Ahorra Lima",
+  "description": "Compara precios de Plaza Vea, Wong, Metro, Tottus y Vivanda por producto o por tu lista completa.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFFFFF",
+  "theme_color": "#1B6FA8",
+  "lang": "es-PE",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
