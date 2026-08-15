@@ -327,11 +327,14 @@ function logoMark(size){
 }
 
 /* ---------------- seed data ---------------- */
+// Tottus queda fuera a propósito ("fase 2" en el backend): su adaptador no
+// logra extraer precios todavía, así que mostrarlo aquí sería un chip
+// "No encontrado" permanente en cada producto. Se vuelve a agregar cuando
+// el backend lo tenga funcionando de verdad.
 const SUPERMARKETS = [
   {id:"plazavea", name:"Plaza Vea", color:"#C9483A"},
   {id:"wong", name:"Wong", color:"#2F8F52"},
   {id:"metro", name:"Metro", color:"#D98A2B"},
-  {id:"tottus", name:"Tottus", color:"#A6488B"},
   {id:"vivanda", name:"Vivanda", color:"#3B7DC4"}
 ];
 const SM = Object.fromEntries(SUPERMARKETS.map(s=>[s.id,s]));
@@ -349,10 +352,6 @@ const STORES = [
   {id:"m2",chain:"metro",name:"Metro Comas",place:"Av. Túpac Amaru",district:"Comas",lat:-11.9350,lng:-77.0520},
   {id:"m3",chain:"metro",name:"Metro Ate",place:"Av. Nicolás Ayllón",district:"Ate",lat:-12.0260,lng:-76.9180},
   {id:"m4",chain:"metro",name:"Metro Chorrillos",place:"Av. Defensores del Morro",district:"Chorrillos",lat:-12.1710,lng:-77.0180},
-  {id:"t1",chain:"tottus",name:"Tottus San Miguel",place:"Plaza San Miguel",district:"San Miguel",lat:-12.0790,lng:-77.0870},
-  {id:"t2",chain:"tottus",name:"Tottus Los Olivos",place:"Plaza Norte",district:"Los Olivos",lat:-11.9800,lng:-77.0650},
-  {id:"t3",chain:"tottus",name:"Tottus Surco",place:"Av. Angamos Este",district:"Surco",lat:-12.1170,lng:-77.0000},
-  {id:"t4",chain:"tottus",name:"Tottus Jesús María",place:"Av. Salaverry",district:"Jesús María",lat:-12.0742,lng:-77.0487},
   {id:"v1",chain:"vivanda",name:"Vivanda Miraflores",place:"Av. Pardo",district:"Miraflores",lat:-12.1219,lng:-77.0297},
   {id:"v2",chain:"vivanda",name:"Vivanda San Isidro",place:"Camino Real",district:"San Isidro",lat:-12.0960,lng:-77.0360},
   {id:"v3",chain:"vivanda",name:"Vivanda La Molina",place:"Molina Plaza",district:"La Molina",lat:-12.0845,lng:-76.9430},
@@ -890,7 +889,7 @@ function screenHome(){
           <span style="color:var(--ink-2);">${ic("store",22)}</span>
           <div>
             <div style="font-weight:800;font-size:14.5px;">Supermercados cercanos</div>
-            <div class="faint">${state.location ? "Ver las 5 cadenas cerca de ti" : "Activa tu ubicación para ver distancias"}</div>
+            <div class="faint">${state.location ? `Ver las ${SUPERMARKETS.length} cadenas cerca de ti` : "Activa tu ubicación para ver distancias"}</div>
           </div>
         </div>
         ${ic("chevronRight",18)}
