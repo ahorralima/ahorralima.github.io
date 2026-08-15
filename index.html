@@ -567,6 +567,7 @@ const state = {
   screen: "home",
   navStack: [],
   location: storage.get("al_location", null),
+  geoError: null,
   list: storage.get("al_list", []),
   favorites: storage.get("al_favorites", []),
   userName: storage.get("al_username", null),
@@ -639,9 +640,9 @@ const ACTIONS = {
   "use-geo":()=>{ requestGeolocation(); },
   "set-district":(el)=>{
     const d = DISTRICTS.find(x=>x.id===el.dataset.id);
-    if(d){ state.location={lat:d.lat,lng:d.lng,label:d.name,manual:true}; saveLoc(); go("home"); }
+    if(d){ state.location={lat:d.lat,lng:d.lng,label:d.name,manual:true}; state.geoError=null; saveLoc(); go("home"); }
   },
-  "clear-location":()=>{ state.location=null; saveLoc(); render(); },
+  "clear-location":()=>{ state.location=null; state.geoError=null; saveLoc(); render(); },
   "skip-location":()=>{ goBack(); },
   "suggestion-pick":(el)=>{ state.query = el.dataset.q; render(); focusSearchSoon(true); },
   "search-popular":(el)=>{ state.query = el.dataset.q; render(); focusSearchSoon(true); },
@@ -686,13 +687,26 @@ function requestGeolocation(){
   renderModal();
   navigator.geolocation.getCurrentPosition(function(pos){
     state.location = {lat:pos.coords.latitude, lng:pos.coords.longitude, label:"Tu ubicación actual", manual:false};
+    state.geoError = null;
     saveLoc();
     state.modal=null;
     go("home");
   }, function(err){
-    state.modal = {type:"error", text:"No pudimos obtener tu ubicación automáticamente (" + (err && err.message ? err.message : "permiso denegado") + "). Elige tu distrito en la lista de abajo."};
+    // No tocar state.location: si ya había una (manual o vieja), se sigue
+    // mostrando — pero geoError queda marcado para avisarlo en la
+    // pantalla de inicio, en vez de que el fallo desaparezca sin dejar rastro.
+    const denied = err && err.code === 1;
+    state.geoError = denied
+      ? "Tu navegador bloqueó el permiso de ubicación para esta página."
+      : "No pudimos obtener tu ubicación automáticamente" + (err && err.message ? " (" + err.message + ")" : "") + ".";
+    state.modal = {
+      type:"error",
+      text: state.geoError + (denied
+        ? " Revisa los permisos de ubicación de tu navegador o del teléfono para este sitio, o elige tu distrito en la lista de abajo."
+        : " Elige tu distrito en la lista de abajo o inténtalo de nuevo.")
+    };
     renderModal();
-  }, {enableHighAccuracy:false, timeout:8000, maximumAge:600000});
+  }, {enableHighAccuracy:false, timeout:8000, maximumAge:0});
 }
 
 /* ---------------- render: shell ---------------- */
@@ -815,7 +829,8 @@ function locationChip(){
       <span style="color:var(--brand);">${ic("pin",18)}</span>
       <span style="flex:1;text-align:left;font-size:13px;font-weight:700;">${esc(state.location.label)}</span>
       ${ic("chevronRight",16)}
-    </button>`;
+    </button>` + (state.geoError ? `
+    <div class="stale-note" style="margin-top:8px;">${ic("info",16)}<span style="flex:1;">${esc(state.geoError)} Mostrando "${esc(state.location.label)}".</span></div>` : "");
   }
   return `<button class="row card card-tap" data-action="open-location" style="width:100%;border:1px dashed var(--border);">
     <span style="color:var(--ink-3);">${ic("pin",18)}</span>
@@ -1308,6 +1323,7 @@ function screenLocation(){
   <div class="card card-brand" style="margin-bottom:16px;">
     <div class="row" style="gap:8px;">${ic("pin",18)}<span style="font-weight:700;">${esc(state.location.label)}</span></div>
   </div>
+  <button class="btn btn-primary btn-block" data-action="use-geo" style="margin-bottom:10px;">${ic("pin",18)} Actualizar con mi ubicación actual</button>
   <button class="btn btn-ghost btn-block" data-action="clear-location" style="margin-bottom:20px;">Quitar ubicación</button>
   ` : `
   <button class="btn btn-primary btn-block" data-action="use-geo" style="margin-bottom:20px;">${ic("pin",18)} Usar mi ubicación actual</button>
@@ -1328,14 +1344,14 @@ function screenAbout(){
     <div class="logo" style="width:44px;height:44px;">${logoMark(28)}</div>
     <div>
       <div style="font-weight:800;font-size:16px;">Ahorra Lima</div>
-      <div class="faint">MVP de demostración</div>
+      <div class="faint">Precios reales, actualizados cada día</div>
     </div>
   </div>
   <div class="stack">
     <p class="subtle">Ahorra Lima ayuda a encontrar en qué supermercado conviene comprar un producto o una lista completa, comparando precios y la distancia hasta cada tienda. Es gratuita: sin publicidad ni suscripciones en esta primera versión.</p>
     <div class="card">
       <p style="font-weight:800;font-size:13.5px;margin-bottom:6px;">Sobre estos datos</p>
-      <p class="subtle">Este prototipo simula Plaza Vea, Wong, Metro, Tottus y Vivanda con precios de ejemplo generados de forma determinística (variación por tienda, historial de 30 días y frescura de cada dato). En producción, un servicio de actualización diaria obtendría los precios reales desde cada supermercado, los normalizaría a un catálogo común y publicaría fecha y hora de verificación — sin depender de que los usuarios los reporten.</p>
+      <p class="subtle">Los precios de Plaza Vea, Wong y Metro se obtienen automáticamente todos los días directo de cada tienda. Los de Vivanda se cargan a mano porque esa tienda no permite la carga automática. Tottus todavía no está disponible — su sitio bloquea la lectura automática y estamos trabajando en eso. Cada precio muestra cuándo se verificó por última vez; si un producto no aparece en alguna tienda es porque no lo pudimos confirmar con suficiente confianza, no porque se haya inventado un precio.</p>
     </div>
     <div class="card">
       <p style="font-weight:800;font-size:13.5px;margin-bottom:6px;">Privacidad</p>
