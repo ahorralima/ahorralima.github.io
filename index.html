@@ -1379,22 +1379,106 @@ function comparisonInsight(cmp){
 }
 
 const SITE_URL = "https://ahorralima.com/";
+
+// Cuánto te ahorras usando la recomendación en vez de ir "a ciegas" a la
+// tienda más cara que igual tenía todo tu pedido. Si no hay al menos 2
+// tiendas con la lista completa, no hay una comparación justa que
+// mostrar — se omite en vez de inventar un número.
+function biggestSavings(cmp){
+  const complete = cmp.perChainFull.filter(o=>o.missing.length===0);
+  if(complete.length<2) return null;
+  const worst = complete[complete.length-1];
+  const diff = worst.total - cmp.recommended.total;
+  return diff>0.05 ? diff : null;
+}
+
 function shareMessageFor(cmp){
   const {rec, sameOption} = comparisonInsight(cmp);
   const base = `Comparé mi lista de compras (${cmp.totalItems} producto${cmp.totalItems===1?"":"s"}) en Ahorra Lima: me conviene comprar todo en ${optionLabel(rec)}, ${formatSoles(rec.total)}.`;
   const extra = !sameOption ? " Hasta me dice si vale la pena dividir la compra entre tiendas o no." : "";
   return `${base}${extra} Compara tu propia lista gratis: ${SITE_URL}`;
 }
+
+// Arma la tarjeta cuadrada (1080x1080) para compartir en WhatsApp/Stories.
+// Todo con Canvas nativo del navegador, sin ningún servicio externo.
+function drawShareCard(cmp){
+  const savings = biggestSavings(cmp);
+  const canvas = document.createElement("canvas");
+  canvas.width = 1080; canvas.height = 1080;
+  const ctx = canvas.getContext("2d");
+
+  const grad = ctx.createLinearGradient(0,0,1080,1080);
+  grad.addColorStop(0, "#1B6FA8");
+  grad.addColorStop(1, "#0E4568");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,1080,1080);
+
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#FFFFFF";
+
+  ctx.font = "160px -apple-system, Helvetica, Arial, sans-serif";
+  ctx.fillText("🛒", 540, 300);
+
+  if(savings){
+    ctx.font = "700 66px -apple-system, Helvetica, Arial, sans-serif";
+    wrapCenteredText(ctx, `Ahorré ${formatSoles(savings)} en mi compra`, 540, 420, 920, 76);
+  } else {
+    ctx.font = "700 60px -apple-system, Helvetica, Arial, sans-serif";
+    wrapCenteredText(ctx, `Mi compra sale en ${formatSoles(cmp.recommended.total)}`, 540, 420, 920, 72);
+  }
+
+  ctx.font = "42px -apple-system, Helvetica, Arial, sans-serif";
+  ctx.fillStyle = "#DDEAF4";
+  ctx.fillText(`Comparé ${cmp.totalItems} producto${cmp.totalItems===1?"":"s"} en 5 supermercados`, 540, 620);
+
+  ctx.font = "700 40px -apple-system, Helvetica, Arial, sans-serif";
+  ctx.fillStyle = "#E0A72E";
+  ctx.fillText(`🥇 Me conviene ${optionLabel(cmp.recommended)}`, 540, 700);
+
+  ctx.fillStyle = "rgba(255,255,255,0.25)";
+  ctx.fillRect(140, 840, 800, 2);
+
+  ctx.font = "700 54px -apple-system, Helvetica, Arial, sans-serif";
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillText("Ahorra Lima", 540, 930);
+
+  ctx.font = "36px -apple-system, Helvetica, Arial, sans-serif";
+  ctx.fillStyle = "#DDEAF4";
+  ctx.fillText("Descubre dónde te conviene comprar", 540, 980);
+  ctx.fillText(SITE_URL, 540, 1030);
+
+  return canvas;
+}
+function wrapCenteredText(ctx, text, x, y, maxWidth, lineHeight){
+  const words = text.split(" ");
+  let line = "", lines = [];
+  for(const w of words){
+    const test = line ? line+" "+w : w;
+    if(ctx.measureText(test).width > maxWidth && line){ lines.push(line); line = w; }
+    else line = test;
+  }
+  lines.push(line);
+  const startY = y - (lines.length-1)*lineHeight/2;
+  lines.forEach((l,i)=> ctx.fillText(l, x, startY + i*lineHeight));
+}
+
 async function shareSavings(){
   if(state.list.length===0) return;
   const cmp = buildComparison();
   if(cmp.totalItems===0) return;
   const text = shareMessageFor(cmp);
+  const canvas = drawShareCard(cmp);
+  const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+  const file = blob ? new File([blob], "ahorra-lima.png", {type:"image/png"}) : null;
+
+  if(file && navigator.canShare && navigator.canShare({files:[file]})){
+    try{ await navigator.share({text, files:[file]}); return; } catch(e){ return; /* el usuario canceló */ }
+  }
   if(navigator.share){
     try{ await navigator.share({text, url: SITE_URL}); } catch(e){ /* el usuario canceló, no hacer nada */ }
-  } else {
-    window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank", "noopener");
+    return;
   }
+  window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank", "noopener");
 }
 
 function screenListResult(){
