@@ -1,7 +1,7 @@
 {
   "name": "Ahorra Lima",
   "short_name": "Ahorra Lima",
-  "description": "Compara precios de Plaza Vea, Wong, Metro, Tottus y Vivanda por producto o por tu lista completa.",
+  "description": "Compara precios de Plaza Vea, Wong, Metro, Makro y Vivanda por producto o por tu lista completa.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
