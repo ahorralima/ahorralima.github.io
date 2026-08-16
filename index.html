@@ -336,6 +336,7 @@ const SUPERMARKETS = [
   {id:"plazavea", name:"Plaza Vea", color:"#C9483A"},
   {id:"wong", name:"Wong", color:"#2F8F52"},
   {id:"metro", name:"Metro", color:"#D98A2B"},
+  {id:"makro", name:"Makro", color:"#00529B"},
   {id:"vivanda", name:"Vivanda", color:"#3B7DC4"}
 ];
 const SM = Object.fromEntries(SUPERMARKETS.map(s=>[s.id,s]));
@@ -353,6 +354,10 @@ const STORES = [
   {id:"m2",chain:"metro",name:"Metro Comas",place:"Av. Túpac Amaru",district:"Comas",lat:-11.9350,lng:-77.0520},
   {id:"m3",chain:"metro",name:"Metro Ate",place:"Av. Nicolás Ayllón",district:"Ate",lat:-12.0260,lng:-76.9180},
   {id:"m4",chain:"metro",name:"Metro Chorrillos",place:"Av. Defensores del Morro",district:"Chorrillos",lat:-12.1710,lng:-77.0180},
+  {id:"mk1",chain:"makro",name:"Makro Comas",place:"Av. Túpac Amaru",district:"Comas",lat:-11.9350,lng:-77.0520},
+  {id:"mk2",chain:"makro",name:"Makro Chorrillos",place:"Av. Defensores del Morro",district:"Chorrillos",lat:-12.1710,lng:-77.0180},
+  {id:"mk3",chain:"makro",name:"Makro Surco",place:"Higuereta",district:"Surco",lat:-12.1391,lng:-76.9946},
+  {id:"mk4",chain:"makro",name:"Makro Callao",place:"Av. Jorge Chávez",district:"Callao",lat:-12.0560,lng:-77.1180},
   {id:"v1",chain:"vivanda",name:"Vivanda Miraflores",place:"Av. Pardo",district:"Miraflores",lat:-12.1219,lng:-77.0297},
   {id:"v2",chain:"vivanda",name:"Vivanda San Isidro",place:"Camino Real",district:"San Isidro",lat:-12.0960,lng:-77.0360},
   {id:"v3",chain:"vivanda",name:"Vivanda La Molina",place:"Molina Plaza",district:"La Molina",lat:-12.0845,lng:-76.9430},
@@ -1460,7 +1465,7 @@ function screenAbout(){
     <p class="subtle">Ahorra Lima ayuda a encontrar en qué supermercado conviene comprar un producto o una lista completa, comparando precios y la distancia hasta cada tienda. Es gratuita: sin publicidad ni suscripciones en esta primera versión.</p>
     <div class="card">
       <p style="font-weight:800;font-size:13.5px;margin-bottom:6px;">Sobre estos datos</p>
-      <p class="subtle">Los precios de Plaza Vea, Wong y Metro se obtienen automáticamente todos los días directo de cada tienda. Los de Vivanda se cargan a mano porque esa tienda no permite la carga automática. Tottus todavía no está disponible — su sitio bloquea la lectura automática y estamos trabajando en eso. Cada precio muestra cuándo se verificó por última vez; si un producto no aparece en alguna tienda es porque no lo pudimos confirmar con suficiente confianza, no porque se haya inventado un precio.</p>
+      <p class="subtle">Los precios de Plaza Vea, Wong, Metro y Makro se obtienen automáticamente todos los días directo de cada tienda. Los de Vivanda se cargan a mano porque esa tienda no permite la carga automática. Tottus todavía no está disponible — su sitio bloquea la lectura automática y estamos trabajando en eso. Cada precio muestra cuándo se verificó por última vez; si un producto no aparece en alguna tienda es porque no lo pudimos confirmar con suficiente confianza, no porque se haya inventado un precio.</p>
     </div>
     <div class="card">
       <p style="font-weight:800;font-size:13.5px;margin-bottom:6px;">Privacidad</p>
