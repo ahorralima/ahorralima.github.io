@@ -965,6 +965,36 @@ function offersNearYou(){
   results.sort((a,b)=> a.pct - b.pct);
   return results;
 }
+// Lo primero que se ve al abrir la app. Si ya tienes una lista armada,
+// no es "busca un producto" — es "esto es lo que te conviene comprar y
+// dónde", con el ahorro real ya calculado. Si no, invita a armarla.
+function homeHero(){
+  if(state.list.length===0){
+    return `
+    <button class="card card-brand card-tap" style="width:100%;text-align:left;border:0;margin-bottom:20px;" data-action="open-search">
+      <div class="row" style="gap:8px;margin-bottom:6px;">${ic("list",20)}<strong style="font-size:16px;">Arma tu lista de compras</strong></div>
+      <p class="subtle" style="margin:0 0 14px;">Agrega lo que compras siempre y te decimos en qué supermercado te conviene comprarlo todo — precio y distancia juntos, no solo el más barato producto por producto.</p>
+      <div class="row" style="gap:6px;color:var(--brand);font-weight:700;font-size:13.5px;">${ic("search",16)} Empezar mi lista</div>
+    </button>`;
+  }
+  const cmp = buildComparison();
+  if(cmp.totalItems===0) return "";
+  const {rec, sameOption, savingsMsg} = comparisonInsight(cmp);
+  return `
+  <button class="card card-brand card-tap" style="width:100%;text-align:left;border:0;margin-bottom:20px;" data-action="open-list-result">
+    <div class="row-between" style="margin-bottom:8px;">
+      <div class="row" style="gap:8px;">${ic("list",18)}<strong style="font-size:13.5px;">Tu lista de compras</strong></div>
+      <span class="faint">${cmp.totalItems} producto${cmp.totalItems===1?"":"s"}</span>
+    </div>
+    <div class="row" style="gap:6px;margin-bottom:2px;">
+      <span style="font-size:18px;">🥇</span><strong style="font-size:15.5px;">Te recomendamos ${optionLabel(rec)}</strong>
+    </div>
+    <div class="price price-lg" style="margin:2px 0 4px;">${formatSoles(rec.total)}</div>
+    ${state.location && rec.distanceKm!=null ? `<div class="faint row" style="gap:6px;">${ic("walk",14)} ${formatDistance(rec.distanceKm)}</div>` : ""}
+    ${!sameOption ? `<div class="freshbar" style="margin-top:10px;">${ic("info",16)}${savingsMsg}</div>` : ""}
+    <div class="row" style="justify-content:flex-end;margin-top:10px;gap:4px;color:var(--brand);font-weight:700;font-size:13px;">Ver comparación completa ${ic("chevronRight",14)}</div>
+  </button>`;
+}
 function screenHome(){
   const offers = offersNearYou().slice(0,3);
   const nearbyChains = SUPERMARKETS.map(s=>({s, near: state.location? nearestStore(s.id,state.location): null}))
@@ -982,10 +1012,11 @@ function screenHome(){
         ? `<span class="faint">${esc(state.session.user.email)}${state.syncing?" · sincronizando…":""}</span><button class="greeting-add" data-action="sign-out" style="background:none;border:0;padding:0;">Cerrar sesión</button>`
         : `<button class="greeting-add" data-action="open-login-modal" style="background:none;border:0;padding:0;">Guardar mi lista en la nube</button>`}
     </div>
-    <h1 class="hero-title">¿Qué quieres comprar?</h1>
+    ${homeHero()}
+
     <button class="search-shell" data-action="open-search" style="display:block;width:100%;text-align:left;border:0;background:none;padding:0;margin-bottom:16px;">
       ${ic("search").replace("<svg ", '<svg class="icon-search" ')}
-      <div class="search-input" style="color:var(--ink-3);">Buscar productos, marcas, categorías…</div>
+      <div class="search-input" style="color:var(--ink-3);">${state.list.length ? "Agregar otro producto…" : "Buscar productos, marcas, categorías…"}</div>
     </button>
     <div style="margin-bottom:20px;">${locationChip()}</div>
 
@@ -995,7 +1026,7 @@ function screenHome(){
           <span style="color:var(--brand);">${ic("list",22)}</span>
           <div>
             <div style="font-weight:800;font-size:14.5px;">Mi lista</div>
-            <div class="faint">${state.list.length ? state.list.length+" producto"+(state.list.length===1?"":"s") : "Aún no agregas productos"}</div>
+            <div class="faint">${state.list.length ? "Editar · "+state.list.length+" producto"+(state.list.length===1?"":"s") : "Aún no agregas productos"}</div>
           </div>
         </div>
         ${ic("chevronRight",18)}
@@ -1298,14 +1329,36 @@ function buildComparison(){
   return {totalItems, perChainFull, comboOption, recommended, cheapestOverall};
 }
 
-function screenListResult(){
-  if(state.list.length===0) return emptyState("list","Tu lista está vacía","Agrega productos primero.", `<button class="btn btn-primary" data-action="open-search">Buscar productos</button>`);
-  const cmp = buildComparison();
+function optionLabel(o){ return o.type==="combo" ? "Combinar " + o.chains.map(c=>SM[c].name).join(" + ") : SM[o.chain].name; }
+
+// Resume una comparación en "¿la más barata es igual a la recomendada?" y,
+// si no, un mensaje honesto sobre si vale la pena el rodeo extra. Se usa
+// tanto en el resumen de la pantalla de inicio como en el detalle de la lista.
+function comparisonInsight(cmp){
   const rec = cmp.recommended;
   const cheap = cmp.cheapestOverall;
   const sameOption = rec===cheap || (rec.type===cheap.type && rec.chain===cheap.chain);
+  let savingsMsg = "";
+  if(!sameOption){
+    const realSavings = rec.total - cheap.total;
+    const extraDistance = state.location && rec.distanceKm!=null && cheap.distanceKm!=null ? Math.max(0, cheap.distanceKm - (rec.type==='single'? rec.distanceKm : 0)) : null;
+    if(state.location && cheap.distanceKm!=null){
+      const perKm = extraDistance>0 ? realSavings/extraDistance : Infinity;
+      savingsMsg = perKm>=2.5 || extraDistance<=0.3
+        ? `Vale la pena: ahorras ${formatSoles(realSavings)} y la ruta adicional es de solo ${formatDistance(extraDistance||0)}.`
+        : `Ahorras ${formatSoles(realSavings)} pero recorrerías ${formatDistance(extraDistance||0)} adicionales. Quizás te conviene simplemente comprar todo en ${optionLabel(rec)}.`;
+    } else {
+      savingsMsg = `Podrías ahorrar ${formatSoles(realSavings)} combinando supermercados. Activa tu ubicación para saber si la distancia extra vale la pena.`;
+    }
+  }
+  return {rec, cheap, sameOption, savingsMsg};
+}
 
-  function optionLabel(o){ return o.type==="combo" ? "Combinar " + o.chains.map(c=>SM[c].name).join(" + ") : SM[o.chain].name; }
+function screenListResult(){
+  if(state.list.length===0) return emptyState("list","Tu lista está vacía","Agrega productos primero.", `<button class="btn btn-primary" data-action="open-search">Buscar productos</button>`);
+  const cmp = buildComparison();
+  const {rec, cheap, sameOption, savingsMsg} = comparisonInsight(cmp);
+
   function optionCard(o, kind){
     const badge = kind==="rec" ? '<span class="badge badge-good">Recomendado</span>' : '<span class="badge badge-accent">Más barato</span>';
     const missingCount = o.type==="combo" ? o.missing.length : o.missing.length;
@@ -1321,21 +1374,6 @@ function screenListResult(){
         ${o.type==="combo" ? `<div class="row faint" style="gap:6px;">${ic("store",14)} ${o.storesVisited} supermercado${o.storesVisited===1?"":"s"} a visitar</div>` : ""}
       </div>
     </div>`;
-  }
-
-  let savingsMsg = "";
-  if(!sameOption){
-    const savings = cheap.total - rec.total >= 0 ? (rec.total-cheap.total)*-1 : 0;
-    const realSavings = rec.total - cheap.total;
-    const extraDistance = state.location && rec.distanceKm!=null && cheap.distanceKm!=null ? Math.max(0, cheap.distanceKm - (rec.type==='single'? rec.distanceKm : 0)) : null;
-    if(state.location && cheap.distanceKm!=null){
-      const perKm = extraDistance>0 ? realSavings/extraDistance : Infinity;
-      savingsMsg = perKm>=2.5 || extraDistance<=0.3
-        ? `Vale la pena: ahorras ${formatSoles(realSavings)} y la ruta adicional es de solo ${formatDistance(extraDistance||0)}.`
-        : `Ahorras ${formatSoles(realSavings)} pero recorrerías ${formatDistance(extraDistance||0)} adicionales. Quizás te conviene simplemente comprar todo en ${optionLabel(rec)}.`;
-    } else {
-      savingsMsg = `Podrías ahorrar ${formatSoles(realSavings)} combinando supermercados. Activa tu ubicación para saber si la distancia extra vale la pena.`;
-    }
   }
 
   return `
