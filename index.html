@@ -416,15 +416,27 @@ let PRICES = {};      // `${productId}|${chainId}` -> fila de product_prices
 let HISTORY = {};     // `${productId}|${chainId}` -> [{price, recorded_at}] ascendente
 
 async function fetchTable(name, query){
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${name}?${query}`, {
-    headers: {
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-      Range: "0-4999"
-    }
-  });
-  if(!res.ok) throw new Error(`${name}: ${res.status}`);
-  return res.json();
+  // Supabase limita cada respuesta a 1000 filas sin importar qué Range se
+  // pida — con 204 productos × varias tiendas + historial, ya pasamos esa
+  // cifra (y solo va a crecer), así que hay que paginar de verdad. Se pide
+  // de a 1000 y se sigue mientras la página venga llena.
+  const pageSize = 1000;
+  let from = 0, all = [];
+  while(true){
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${name}?${query}`, {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        Range: `${from}-${from + pageSize - 1}`
+      }
+    });
+    if(!res.ok) throw new Error(`${name}: ${res.status}`);
+    const page = await res.json();
+    all = all.concat(page);
+    if(page.length < pageSize) break;
+    from += pageSize;
+  }
+  return all;
 }
 
 async function loadRealData(){
@@ -501,6 +513,13 @@ function allOffers(product, loc){
   return SUPERMARKETS.map(s=>chainOffer(product, s.id, loc));
 }
 function nearbyStoreOffers(product, loc, limit){
+  // Ojo: "las 8 más cercanas" se calcula SOLO entre las que sí tienen el
+  // producto. Antes se tomaban las 8 tiendas físicas más cercanas sin
+  // importar si lo tenían, así que una cadena como Vivanda (sin el
+  // producto) podía tapar el primer lugar con "No encontrado" aunque
+  // Plaza Vea, un poco más lejos, sí lo tuviera — o, peor, si la única
+  // cadena con el producto no tenía ningún local entre los 8 más
+  // cercanos, la tarjeta entera se veía vacía aunque sí había precio.
   return STORES.map(s=>({
     chain: s.chain,
     price: priceAtStoreKey(product, s.chain, s.id),
@@ -508,7 +527,7 @@ function nearbyStoreOffers(product, loc, limit){
     store: s,
     distanceKm: haversineKm(loc.lat, loc.lng, s.lat, s.lng),
     updated: updatedAt(product.id, s.chain)
-  })).sort((a,b)=>a.distanceKm-b.distanceKm).slice(0, limit||8);
+  })).filter(o=>o.available).sort((a,b)=>a.distanceKm-b.distanceKm).slice(0, limit||8);
 }
 function unitPriceLabel(product, price){
   let baseQty, label;
@@ -1135,6 +1154,8 @@ function chainPriceChip(o, isCheapest){
 function nearbyDisplayOffers(p, limit){
   limit = limit || 10;
   if(state.location) return nearbyStoreOffers(p, state.location, limit);
+  // Mismo criterio que nearbyStoreOffers: solo tiendas que sí tienen el
+  // producto, nunca rellenar con "No encontrado".
   return STORES.map(s=>({
     chain: s.chain,
     price: priceAtStoreKey(p, s.chain, s.id),
@@ -1142,10 +1163,7 @@ function nearbyDisplayOffers(p, limit){
     store: s,
     distanceKm: null,
     updated: updatedAt(p.id, s.chain)
-  })).sort((a,b)=>{
-    if(a.available!==b.available) return a.available?-1:1;
-    return a.price-b.price;
-  }).slice(0, limit);
+  })).filter(o=>o.available).sort((a,b)=>a.price-b.price).slice(0, limit);
 }
 function productResultRow(p){
   const display = nearbyDisplayOffers(p);
@@ -1159,9 +1177,7 @@ function productResultRow(p){
         </div>
         ${cheapest ? `<div class="price" style="flex-shrink:0;">${formatSoles(cheapest.price)}</div>` : `<div class="faint">No encontrado</div>`}
       </div>
-      <div class="chaingrid">
-        ${display.map((o,i)=>chainPriceChip(o, cheapest && o===cheapest)).join("")}
-      </div>
+      ${display.length ? `<div class="chaingrid">${display.map((o,i)=>chainPriceChip(o, cheapest && o===cheapest)).join("")}</div>` : `<p class="faint" style="margin:0;">No lo encontramos en ninguna tienda por ahora.</p>`}
     </div>`;
 }
 function screenSearch(){ return `<div id="searchResults">${searchResultsHTML()}</div>`; }
@@ -1564,9 +1580,7 @@ function screenFavorites(){
           ${starBtn(p.id,20)}
         </div>
       </div>
-      <div class="chaingrid">
-        ${display.map(o=>chainPriceChip(o, cheapest && o===cheapest)).join("")}
-      </div>
+      ${display.length ? `<div class="chaingrid">${display.map(o=>chainPriceChip(o, cheapest && o===cheapest)).join("")}</div>` : `<p class="faint" style="margin:0;">No lo encontramos en ninguna tienda por ahora.</p>`}
     </div>`;
   }).join("");
   return `<div class="stack-sm">${rows}</div>`;
