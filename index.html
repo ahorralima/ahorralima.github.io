@@ -969,14 +969,7 @@ function offersNearYou(){
 // no es "busca un producto" — es "esto es lo que te conviene comprar y
 // dónde", con el ahorro real ya calculado. Si no, invita a armarla.
 function homeHero(){
-  if(state.list.length===0){
-    return `
-    <button class="card card-brand card-tap" style="width:100%;text-align:left;border:0;margin-bottom:20px;" data-action="open-search">
-      <div class="row" style="gap:8px;margin-bottom:6px;">${ic("list",20)}<strong style="font-size:16px;">Arma tu lista de compras</strong></div>
-      <p class="subtle" style="margin:0 0 14px;">Agrega lo que compras siempre y te decimos en qué supermercado te conviene comprarlo todo — precio y distancia juntos, no solo el más barato producto por producto.</p>
-      <div class="row" style="gap:6px;color:var(--brand);font-weight:700;font-size:13.5px;">${ic("search",16)} Empezar mi lista</div>
-    </button>`;
-  }
+  if(state.list.length===0) return "";
   const cmp = buildComparison();
   if(cmp.totalItems===0) return "";
   const {rec, sameOption, savingsMsg} = comparisonInsight(cmp);
@@ -1013,7 +1006,7 @@ function screenHome(){
         : `<button class="greeting-add" data-action="open-login-modal" style="background:none;border:0;padding:0;">Guardar mi lista en la nube</button>`}
     </div>
     ${homeHero()}
-
+    ${state.list.length===0 ? `<h1 class="hero-title">¿Qué quieres comprar?</h1>` : ""}
     <button class="search-shell" data-action="open-search" style="display:block;width:100%;text-align:left;border:0;background:none;padding:0;margin-bottom:16px;">
       ${ic("search").replace("<svg ", '<svg class="icon-search" ')}
       <div class="search-input" style="color:var(--ink-3);">${state.list.length ? "Agregar otro producto…" : "Buscar productos, marcas, categorías…"}</div>
