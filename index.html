@@ -1409,10 +1409,14 @@ function biggestSavings(cmp){
 }
 
 function shareMessageFor(cmp){
-  const {rec, sameOption} = comparisonInsight(cmp);
-  const base = `Comparé mi lista de compras (${cmp.totalItems} producto${cmp.totalItems===1?"":"s"}) en Ahorra Lima: me conviene comprar todo en ${optionLabel(rec)}, ${formatSoles(rec.total)}.`;
-  const extra = !sameOption ? " Hasta me dice si vale la pena dividir la compra entre tiendas o no." : "";
-  return `${base}${extra} Compara tu propia lista gratis: ${SITE_URL}`;
+  const {rec} = comparisonInsight(cmp);
+  const savings = biggestSavings(cmp);
+  // Mismo número que ya se ve en la imagen (contra la opción completa más
+  // cara), así el texto y la imagen nunca se contradicen.
+  if(savings){
+    return `Ahorré ${formatSoles(savings)} en mi compra usando Ahorra Lima 🛒 Tú también puedes comparar tu lista gratis y seguir ahorrando: ${SITE_URL}`;
+  }
+  return `Comparé mi lista de compras en Ahorra Lima: me conviene comprar todo en ${optionLabel(rec)}, ${formatSoles(rec.total)}. Compara tu propia lista gratis y empieza a ahorrar: ${SITE_URL}`;
 }
 
 // Arma la tarjeta cuadrada (1080x1080) para compartir en WhatsApp/Stories.
@@ -1487,11 +1491,15 @@ async function shareSavings(){
   const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
   const file = blob ? new File([blob], "ahorra-lima.png", {type:"image/png"}) : null;
 
+  // Importante: nunca mandar "url" como campo aparte de "text" — algunas
+  // apps (WhatsApp incluido, según versión) muestran SOLO el link y
+  // descartan el texto cuando reciben los dos campos separados. El link
+  // ya viene incluido dentro de "text", así que basta con ese campo.
   if(file && navigator.canShare && navigator.canShare({files:[file]})){
     try{ await navigator.share({text, files:[file]}); return; } catch(e){ return; /* el usuario canceló */ }
   }
   if(navigator.share){
-    try{ await navigator.share({text, url: SITE_URL}); } catch(e){ /* el usuario canceló, no hacer nada */ }
+    try{ await navigator.share({text}); } catch(e){ /* el usuario canceló, no hacer nada */ }
     return;
   }
   window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank", "noopener");
