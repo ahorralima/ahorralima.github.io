@@ -1284,10 +1284,16 @@ function buildComparison(){
   };
 
   const allOptions = [...perChainFull.map(c=>({type:"single", ...c})), {type:"combo", ...comboOption}];
-  const recommended = allOptions.slice().sort((a,b)=>a.score-b.score)[0];
+  // Nunca recomendar (ni marcar "más barato") una opción que no cubre casi
+  // toda la lista, sin importar qué tan barata sea esa fracción — de nada
+  // sirve el precio más bajo si te faltan 5 de 6 productos al llegar.
+  // Se prefieren las opciones completas; si ninguna cubre el 100%, recién
+  // ahí se compara contra todas (mejor una recomendación imperfecta que
+  // ninguna, para listas muy grandes donde nadie tiene todo).
   const completeOptions = allOptions.filter(o=>o.missing.length===0);
-  const cheapestPool = completeOptions.length ? completeOptions : allOptions;
-  const cheapestOverall = cheapestPool.slice().sort((a,b)=>a.total-b.total)[0];
+  const pool = completeOptions.length ? completeOptions : allOptions;
+  const recommended = pool.slice().sort((a,b)=>a.score-b.score)[0];
+  const cheapestOverall = pool.slice().sort((a,b)=>a.total-b.total)[0];
 
   return {totalItems, perChainFull, comboOption, recommended, cheapestOverall};
 }
