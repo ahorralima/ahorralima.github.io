@@ -573,6 +573,7 @@ function productBlob(p){
   p._nameBlob = normalize(p.name+" "+p.brand);
   return blob;
 }
+const SEARCH_STOPWORDS = new Set(["de","la","el","los","las","del","con","sin","y","o","para","por","un","una"]);
 function searchProducts(query, limit){
   const nq = normalize(expandQuery(normalize(query)));
   const qTokens = nq.split(" ").filter(Boolean);
@@ -581,7 +582,7 @@ function searchProducts(query, limit){
     productBlob(p);
     let score=0;
     for(const qt of qTokens){
-      if(qt.length<2) continue;
+      if(qt.length<2 || SEARCH_STOPWORDS.has(qt)) continue;
       if(p._blob.includes(qt)){
         score += p._nameBlob.includes(qt) ? 12 : 8;
         if(p._nameBlob.startsWith(qt)) score += 4;
