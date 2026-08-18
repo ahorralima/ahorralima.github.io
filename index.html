@@ -1166,9 +1166,18 @@ function nearbyDisplayOffers(p, limit){
     updated: updatedAt(p.id, s.chain)
   })).filter(o=>o.available).sort((a,b)=>a.price-b.price).slice(0, limit);
 }
+function bestOfferFor(display){
+  const available = display.filter(o=>o.available);
+  if(available.length===0) return null;
+  if(!state.location) return available.slice().sort((a,b)=>a.price-b.price)[0];
+  return available.slice().sort((a,b)=>
+    optionScore({total:a.price,distanceKm:a.distanceKm||0,missing:0,storesVisited:1}) -
+    optionScore({total:b.price,distanceKm:b.distanceKm||0,missing:0,storesVisited:1})
+  )[0];
+}
 function productResultRow(p){
   const display = nearbyDisplayOffers(p);
-  const cheapest = display.filter(o=>o.available).sort((a,b)=>a.price-b.price)[0];
+  const best = bestOfferFor(display);
   return `
     <div class="card" style="cursor:pointer;" data-action="open-product" data-id="${p.id}">
       <div class="row-between" style="margin-bottom:10px;">
@@ -1176,9 +1185,9 @@ function productResultRow(p){
           <div style="font-weight:700;font-size:14px;">${esc(p.name)}</div>
           <div class="faint" style="margin-top:2px;">${esc(p.brand)} · ${esc(p.presentation)}</div>
         </div>
-        ${cheapest ? `<div class="price" style="flex-shrink:0;">${formatSoles(cheapest.price)}</div>` : `<div class="faint">No encontrado</div>`}
+        ${best ? `<div class="price" style="flex-shrink:0;">${formatSoles(best.price)}</div>` : `<div class="faint">No encontrado</div>`}
       </div>
-      ${display.length ? `<div class="chaingrid">${display.map((o,i)=>chainPriceChip(o, cheapest && o===cheapest)).join("")}</div>` : `<p class="faint" style="margin:0;">No lo encontramos en ninguna tienda por ahora.</p>`}
+      ${display.length ? `<div class="chaingrid">${display.map((o,i)=>chainPriceChip(o, best && o===best)).join("")}</div>` : `<p class="faint" style="margin:0;">No lo encontramos en ninguna tienda por ahora.</p>`}
     </div>`;
 }
 function screenSearch(){ return `<div id="searchResults">${searchResultsHTML()}</div>`; }
@@ -1576,7 +1585,7 @@ function screenFavorites(){
   }
   const rows = state.favorites.map(pid=>PRODUCT_BY_ID[pid]).filter(Boolean).map(p=>{
     const display = nearbyDisplayOffers(p);
-    const cheapest = display.filter(o=>o.available).sort((a,b)=>a.price-b.price)[0];
+    const best = bestOfferFor(display);
     return `
     <div class="card" style="cursor:pointer;" data-action="open-product" data-id="${p.id}">
       <div class="row-between" style="margin-bottom:10px;">
@@ -1585,11 +1594,11 @@ function screenFavorites(){
           <div class="faint" style="margin-top:2px;">${esc(p.brand)} · ${esc(p.presentation)}</div>
         </div>
         <div class="row" style="gap:6px;flex-shrink:0;">
-          ${cheapest?`<div class="price">${formatSoles(cheapest.price)}</div>`:`<div class="faint">No encontrado</div>`}
+          ${best?`<div class="price">${formatSoles(best.price)}</div>`:`<div class="faint">No encontrado</div>`}
           ${starBtn(p.id,20)}
         </div>
       </div>
-      ${display.length ? `<div class="chaingrid">${display.map(o=>chainPriceChip(o, cheapest && o===cheapest)).join("")}</div>` : `<p class="faint" style="margin:0;">No lo encontramos en ninguna tienda por ahora.</p>`}
+      ${display.length ? `<div class="chaingrid">${display.map(o=>chainPriceChip(o, best && o===best)).join("")}</div>` : `<p class="faint" style="margin:0;">No lo encontramos en ninguna tienda por ahora.</p>`}
     </div>`;
   }).join("");
   return `<div class="stack-sm">${rows}</div>`;
