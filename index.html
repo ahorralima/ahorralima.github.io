@@ -22,23 +22,23 @@
 :root{
   --bg:#FFFFFF;
   --surface:#FFFFFF;
-  --surface-2:#F6F7F8;
-  --surface-3:#EEF0F2;
-  --border:#E2E6EA;
-  --ink:#151E27;
-  --ink-2:#57626D;
-  --ink-3:#8A94A0;
+  --surface-2:#F7F8F9;
+  --surface-3:#F2F4F6;
+  --border:#E0E4E7;
+  --ink:#101418;
+  --ink-2:#31414D;
+  --ink-3:#6B7580;
   --brand:#1B6FA8;
   --brand-ink:#0E4568;
-  --brand-soft:#DDEAF4;
+  --brand-soft:#EAF3F9;
   --accent:#E0A72E;
   --accent-ink:#6B4A0F;
   --accent-soft:#FBF0D9;
   --on-accent:#2A1D06;
-  --good:#1F8A5F;
-  --good-soft:#E1F3EA;
-  --warning:#A8720E;
-  --warning-soft:#FBF0DC;
+  --good:#187A4C;
+  --good-soft:#EAF6EE;
+  --warning:#8A5310;
+  --warning-soft:#FBF3E6;
   --critical:#C1382D;
   --critical-soft:#FBE4E1;
   --shadow:0 1px 2px rgba(15,23,27,.06), 0 10px 26px rgba(15,23,27,.08);
@@ -198,6 +198,8 @@ a{color:inherit;}
 .qtystep{display:flex;align-items:center;gap:0;border:1px solid var(--border);border-radius:999px;overflow:hidden;}
 .qtystep button{width:32px;height:32px;border:0;background:var(--surface);color:var(--ink);font-size:16px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 .qtystep button:hover{background:var(--surface-2);}
+.qtystep button[disabled]{opacity:.35;cursor:not-allowed;}
+.qtystep button[disabled]:hover{background:var(--surface);}
 .qtystep .qtyval{width:28px;text-align:center;font-weight:800;font-variant-numeric:tabular-nums;font-size:14px;}
 
 .listitem{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-m);background:var(--surface);}
@@ -334,11 +336,11 @@ function logoMark(size){
 // "No encontrado" permanente en cada producto. Se vuelve a agregar cuando
 // el backend lo tenga funcionando de verdad.
 const SUPERMARKETS = [
-  {id:"plazavea", name:"Plaza Vea", color:"#C9483A"},
-  {id:"wong", name:"Wong", color:"#2F8F52"},
-  {id:"metro", name:"Metro", color:"#D98A2B"},
-  {id:"makro", name:"Makro", color:"#00529B"},
-  {id:"vivanda", name:"Vivanda", color:"#3B7DC4"}
+  {id:"plazavea", name:"Plaza Vea", color:"#E0463C"},
+  {id:"wong", name:"Wong", color:"#1E9E4A"},
+  {id:"metro", name:"Metro", color:"#E8A33D"},
+  {id:"makro", name:"Makro", color:"#1B3D8F"},
+  {id:"vivanda", name:"Vivanda", color:"#C3D6E8"}
 ];
 const SM = Object.fromEntries(SUPERMARKETS.map(s=>[s.id,s]));
 
@@ -512,22 +514,13 @@ function chainOffer(product, chain, loc){
 function allOffers(product, loc){
   return SUPERMARKETS.map(s=>chainOffer(product, s.id, loc));
 }
-function nearbyStoreOffers(product, loc, limit){
-  // Ojo: "las 8 más cercanas" se calcula SOLO entre las que sí tienen el
-  // producto. Antes se tomaban las 8 tiendas físicas más cercanas sin
-  // importar si lo tenían, así que una cadena como Vivanda (sin el
-  // producto) podía tapar el primer lugar con "No encontrado" aunque
-  // Plaza Vea, un poco más lejos, sí lo tuviera — o, peor, si la única
-  // cadena con el producto no tenía ningún local entre los 8 más
-  // cercanos, la tarjeta entera se veía vacía aunque sí había precio.
-  return STORES.map(s=>({
-    chain: s.chain,
-    price: priceAtStoreKey(product, s.chain, s.id),
-    available: isAvailable(product.id, s.chain),
-    store: s,
-    distanceKm: haversineKm(loc.lat, loc.lng, s.lat, s.lng),
-    updated: updatedAt(product.id, s.chain)
-  })).filter(o=>o.available).sort((a,b)=>a.distanceKm-b.distanceKm).slice(0, limit||8);
+function nearbyStoreOffers(product, loc){
+  // Por cadena, no por sucursal física: cada cadena aparece una sola vez,
+  // con el precio de su local más cercano (igual que allOffers() en el
+  // detalle de producto). Antes se comparaban las 20 sucursales físicas
+  // sueltas, así que una cadena con dos locales cercanos podía repetirse
+  // en la grilla mientras otra cadena quedaba afuera del todo.
+  return allOffers(product, loc);
 }
 function unitPriceLabel(product, price){
   let baseQty, label;
@@ -633,6 +626,14 @@ const state = {
   modal: null
 };
 function saveList(){ storage.set("al_list", state.list); }
+function pruneGhostListItems(){
+  // Si un producto se borra/renombra en el catálogo, se saca de la lista
+  // guardada en vez de solo ocultarlo — así el contador de la pestaña y
+  // el de "Mi lista" siempre coinciden con las filas que sí se ven.
+  const before = state.list.length;
+  state.list = state.list.filter(it=>PRODUCT_BY_ID[it.productId]);
+  if(state.list.length!==before) saveList();
+}
 function saveFav(){ storage.set("al_favorites", state.favorites); }
 function saveLoc(){ storage.set("al_location", state.location); }
 function saveName(){ storage.set("al_username", state.userName); }
@@ -732,6 +733,7 @@ async function syncAfterLogin(session){
     } else {
       state.list = (cloudItems||[]).map(r=>({productId: r.product_id, qty: r.qty}));
       saveList();
+      pruneGhostListItems();
     }
   } catch(err){
     console.error("Error sincronizando con la nube:", err);
@@ -742,8 +744,15 @@ async function syncAfterLogin(session){
 sb.auth.onAuthStateChange((event, session)=>{
   state.session = session;
   if(session){
-    state.modal = null;
-    syncAfterLogin(session);
+    // Solo se vuelve a sincronizar con la nube al iniciar sesión de verdad
+    // (o al cargar la página con una sesión ya activa) — nunca en un
+    // TOKEN_REFRESHED de fondo (Supabase lo dispara periódicamente), que
+    // antes podía traer una copia vieja de la nube y pisar un cambio que
+    // el usuario acababa de hacer en este mismo dispositivo.
+    if(event === "SIGNED_IN" || event === "INITIAL_SESSION"){
+      state.modal = null;
+      syncAfterLogin(session);
+    }
   } else {
     state.listId = null;
   }
@@ -763,7 +772,7 @@ const ACTIONS = {
   "open-location":()=>go("location",{forcePush:true}),
   "open-about":()=>go("about",{forcePush:true}),
   "open-list-result":()=>{ track("recommendation_viewed"); go("listResult",{forcePush:true}); },
-  "close-modal":()=>{ state.modal=null; renderModal(); },
+  "close-modal":()=>{ geoRequestSeq++; state.modal=null; renderModal(); },
   "toggle-fav":(el)=>{ toggleFav(el.dataset.id); render(); },
   "qty-inc":(el)=>{ setListQty(el.dataset.id, listQty(el.dataset.id)+1); render(); },
   "qty-dec":(el)=>{ setListQty(el.dataset.id, listQty(el.dataset.id)-1); render(); },
@@ -825,29 +834,37 @@ document.addEventListener("input", function(e){
   }
 });
 document.addEventListener("keydown", function(e){
-  if(e.key==="Escape" && state.modal){ state.modal=null; renderModal(); }
+  if(e.key==="Escape" && state.modal){ geoRequestSeq++; state.modal=null; renderModal(); }
   if(e.key==="Enter" && e.target.id==="nameInput"){ ACTIONS["save-name"](); }
+  if(e.key==="Enter" && e.target.id==="loginEmailInput"){ ACTIONS["send-magic-link"](); }
 });
 
 function focusSearchSoon(all){
   setTimeout(()=>{ const el=document.getElementById("searchInput"); if(el){ el.focus(); if(all) el.select(); } },30);
 }
 
+let geoRequestSeq = 0;
 function requestGeolocation(){
   if(!("geolocation" in navigator)){
     state.modal = {type:"error", text:"Este navegador no soporta geolocalización. Ingresa tu distrito manualmente."};
     renderModal();
     return;
   }
+  const seq = ++geoRequestSeq;
   state.modal = {type:"loading", text:"Obteniendo tu ubicación…"};
   renderModal();
   navigator.geolocation.getCurrentPosition(function(pos){
+    // Si el usuario cerró este modal (o se disparó otra solicitud) antes de
+    // que el GPS respondiera, geoRequestSeq ya cambió — se ignora el
+    // resultado tardío en vez de navegar de golpe a inicio.
+    if(seq !== geoRequestSeq) return;
     state.location = {lat:pos.coords.latitude, lng:pos.coords.longitude, label:"Tu ubicación actual", manual:false};
     state.geoError = null;
     saveLoc();
     state.modal=null;
     go("home");
   }, function(err){
+    if(seq !== geoRequestSeq) return;
     // No tocar state.location: si ya había una (manual o vieja), se sigue
     // mostrando — pero geoError queda marcado para avisarlo en la
     // pantalla de inicio, en vez de que el fallo desaparezca sin dejar rastro.
@@ -955,10 +972,11 @@ function qtyStepper(pid){
   if(qty===0){
     return `<button class="btn btn-ghost btn-sm" data-action="qty-inc" data-id="${pid}">${ic("plus",14)} Agregar</button>`;
   }
+  const atMax = qty>=20;
   return `<div class="qtystep">
     <button data-action="qty-dec" data-id="${pid}" aria-label="Quitar uno">${ic("minus",14)}</button>
     <span class="qtyval">${qty}</span>
-    <button data-action="qty-inc" data-id="${pid}" aria-label="Agregar uno">${ic("plus",14)}</button>
+    <button data-action="qty-inc" data-id="${pid}" aria-label="${atMax?"Máximo 20 unidades":"Agregar uno"}" ${atMax?"disabled":""}>${ic("plus",14)}</button>
   </div>`;
 }
 function sparkSVG(vals, color){
@@ -1152,19 +1170,17 @@ function chainPriceChip(o, isCheapest){
       ${o.store ? `<div class="cdist">${esc(o.store.place)}${o.distanceKm!=null?" · "+formatDistance(o.distanceKm):""}</div>` : ""}
     </div>`;
 }
-function nearbyDisplayOffers(p, limit){
-  limit = limit || 10;
-  if(state.location) return nearbyStoreOffers(p, state.location, limit);
-  // Mismo criterio que nearbyStoreOffers: solo tiendas que sí tienen el
-  // producto, nunca rellenar con "No encontrado".
-  return STORES.map(s=>({
-    chain: s.chain,
-    price: priceAtStoreKey(p, s.chain, s.id),
-    available: isAvailable(p.id, s.chain),
-    store: s,
-    distanceKm: null,
-    updated: updatedAt(p.id, s.chain)
-  })).filter(o=>o.available).sort((a,b)=>a.price-b.price).slice(0, limit);
+function nearbyDisplayOffers(p){
+  const offers = nearbyStoreOffers(p, state.location);
+  // Disponibles primero (ordenadas por conveniencia, igual que bestOfferFor),
+  // "No encontrado" al final — nunca se ocultan, solo se ordenan al fondo.
+  return offers.slice().sort((a,b)=>{
+    if(a.available!==b.available) return a.available? -1 : 1;
+    if(!a.available) return 0;
+    if(!state.location) return a.price-b.price;
+    return optionScore({total:a.price,distanceKm:a.distanceKm||0,missing:0,storesVisited:1}) -
+           optionScore({total:b.price,distanceKm:b.distanceKm||0,missing:0,storesVisited:1});
+  });
 }
 function bestOfferFor(display){
   const available = display.filter(o=>o.available);
@@ -1742,7 +1758,7 @@ function renderBootChrome(){
 function boot(){
   renderBootChrome();
   document.getElementById("content").innerHTML = emptyState("pin","Cargando precios reales…","Un momento, estamos trayendo los precios más recientes de cada tienda.");
-  loadRealData().then(()=>{ render(); track("app_open"); }).catch(()=>{
+  loadRealData().then(()=>{ pruneGhostListItems(); render(); track("app_open"); }).catch(()=>{
     renderBootChrome();
     document.getElementById("content").innerHTML = emptyState("info","No pudimos cargar los precios",
       "Revisa tu conexión a internet e intenta de nuevo.",
