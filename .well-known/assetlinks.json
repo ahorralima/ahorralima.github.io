@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "pe.com.vivehogar.conecta",
+        "sha256_cert_fingerprints": ["9E:76:4F:05:3B:89:8C:07:A4:FC:3C:92:67:59:48:38:92:B8:CA:62:29:46:B4:AA:36:80:92:63:3A:B7:EB:B7"]
+      }
+    }]
